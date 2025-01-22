@@ -40,14 +40,14 @@ plot(x,fx)
 lines(x, rep(0, length(x)), col = "red", lty = 2)
 ```
 
-9\.
+9.  10\.
 
 ```{r}
-coefs1 = read.table("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/data/coefs1.txt")
+coefs1 = read.table(file.path(getwd(), "p1/data/coefs1.txt"))
 
-coefs2 = read.table("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/data/coefs2.txt")
+coefs2 = read.table(file.path(getwd(), "p1/data/coefs2.txt"))
 
-coefs3 = read.table("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/data/coefs3.txt")
+coefs3 = read.table(file.path(getwd(), "p1/data/coefs3.txt"))
 
 quadratic = function(a, b, c) {
   discriminant <- (b ^ 2) - (4 * a * c)
@@ -79,7 +79,7 @@ for (n in 1:nrow(coef)) {
 }
 
 for (n in 1:length(all_solutions)) {
-  result_file <- paste0("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/results/results", n, ".txt")
+  result_file <- paste0(file.path(getwd()), "/p1/results/results", n, ".txt")
   solutions <- all_solutions[[n]]
   
   if (is.character(solutions)) {
@@ -92,8 +92,4 @@ for (n in 1:length(all_solutions)) {
   
 ```
 
-10\.
-
-```{r}
-
-```
+10

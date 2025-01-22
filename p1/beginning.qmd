@@ -38,20 +38,20 @@ lines(x, rep(0, length(x)), col = "red", lty = 2)
 ```
 
 5\.
-```{r}
-
+```
+#click renderon the beginning.qmd top and then use 
+#mv beginning.pdf docs/
 ```
 
-
 6\.
-```{r}
+```
 #mkdir data
 #mkdir results
 ```
 
 
 7\.
-```{r}
+```
 #cd data
 #nano coefs1.txt
 #1 -1 -2
@@ -59,11 +59,12 @@ lines(x, rep(0, length(x)), col = "red", lty = 2)
 
 
 8\.
-```{r}
+```
 #pwd
 #cd ..
 #mkdir code
 #cpcp beginning.qmd code/quadratic.qmd
 ```
 
-9\.
+10\.
+As by the problem, i changed the file path to the RtmpyDknq4 folder and then render it. It says cannot render it, since it wrong path. after changed it into relative path, it works again. And for the file.path(getwd(), "data/coefs.txt") please see the quadratic.qmd for the right path.
