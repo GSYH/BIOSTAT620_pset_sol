@@ -1,0 +1,99 @@
+---
+title: "beginning.qmd"
+format: pdf
+editor: visual
+---
+
+3\.
+
+```{r}
+a = 1
+b = -1
+c = -2
+
+
+quadratic = function(a, b, c) {
+  discriminant <- (b ^ 2) - (4 * a * c)
+  if (discriminant < 0) {
+    return("no real solutions")
+  }
+  result1 = (-b + sqrt(discriminant)) / (2 * a)
+  result2 = (-b - sqrt(discriminant)) / (2 * a)
+  result = c(result2,result1)
+ 
+  return(result)
+}
+
+
+quadratic(1,-1,-2)
+```
+
+4\.
+
+```{r}
+x <- seq(-5, 5, length = 100)
+
+fx <- a * x^2 + b * x + c
+
+plot(x,fx)
+
+lines(x, rep(0, length(x)), col = "red", lty = 2)
+```
+
+9\.
+
+```{r}
+coefs1 = read.table("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/data/coefs1.txt")
+
+coefs2 = read.table("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/data/coefs2.txt")
+
+coefs3 = read.table("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/data/coefs3.txt")
+
+quadratic = function(a, b, c) {
+  discriminant <- (b ^ 2) - (4 * a * c)
+  if (discriminant < 0) {
+    return("no real solutions")
+  }
+  result1 = (-b + sqrt(discriminant)) / (2 * a)
+  result2 = (-b - sqrt(discriminant)) / (2 * a)
+  result = c(result2,result1)
+ 
+  return(result)
+}
+
+coef = rbind(coefs1, coefs2, coefs3) 
+
+all_solutions <- list()
+
+for (n in 1:nrow(coef)) {
+  
+  a <- coef[n, 1]
+  b <- coef[n, 2]
+  c <- coef[n, 3]
+  
+  solutions = quadratic(a, b, c)
+  
+  all_solutions[[n]] <- solutions
+
+  print(solutions)
+}
+
+for (n in 1:length(all_solutions)) {
+  result_file <- paste0("/Users/gj/Desktop/Winter25/BIOS620/BIOSTAT620_pset_sol/p1/results/results", n, ".txt")
+  solutions <- all_solutions[[n]]
+  
+  if (is.character(solutions)) {
+    cat(solutions, file = result_file, sep = "\n")
+  } else {
+    cat(solutions, file = result_file, sep = "\n")
+  }
+}
+
+  
+```
+
+10\.
+
+```{r}
+
+```

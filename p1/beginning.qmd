@@ -1,0 +1,69 @@
+---
+title: "beginning.qmd"
+format: pdf
+editor: visual
+---
+
+3\.
+
+```{r}
+a = 1
+b = -1
+c = -2
+
+
+quadratic = function(a, b, c) {
+  discriminant <- (b ^ 2) - (4 * a * c)
+  result1 = (-b + sqrt(discriminant)) / (2 * a)
+  result2 = (-b - sqrt(discriminant)) / (2 * a)
+  result = c(result2,result1)
+ 
+  return(result)
+}
+
+
+quadratic(1,-1,-2)
+```
+
+4\.
+
+```{r}
+x <- seq(-5, 5, length = 100)
+
+fx <- a * x^2 + b * x + c
+
+plot(x,fx)
+
+lines(x, rep(0, length(x)), col = "red", lty = 2)
+```
+
+5\.
+```{r}
+
+```
+
+
+6\.
+```{r}
+#mkdir data
+#mkdir results
+```
+
+
+7\.
+```{r}
+#cd data
+#nano coefs1.txt
+#1 -1 -2
+```
+
+
+8\.
+```{r}
+#pwd
+#cd ..
+#mkdir code
+#cpcp beginning.qmd code/quadratic.qmd
+```
+
+9\.
