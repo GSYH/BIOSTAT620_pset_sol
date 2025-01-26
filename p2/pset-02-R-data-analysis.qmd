@@ -73,8 +73,8 @@ dat = NHANES |>
 genderdat = dat|>
   filter(!is.na(dat$BPSysAve))|>
   group_by(Gender)|>
-  summarize(average = mean(BPSysAve), SD = sd(BPSysAve))|>
-print(genderdat)
+  summarize(average = mean(BPSysAve), SD = sd(BPSysAve))
+  kable(genderdat)
 ```
 
 3. (1 point) Because of the large difference in the average between males and females, we will perform the rest of the analysis separately for males and females. 
@@ -88,8 +88,8 @@ genderdat = dat|>
   filter(!is.na(dat$BPSysAve))|>
   group_by(Gender, Race3)|>
   summarize(average = mean(BPSysAve), SD = sd(BPSysAve))|>
-  arrange(desc(average))|>
-print(genderdat)
+  arrange(desc(average))
+kable(genderdat)
 ```
 
 
@@ -110,8 +110,8 @@ finalgenderdat = dat|>
   mutate(lower = average - 1.96 * SD/sqrt(num),
             upper = average + 1.96 * SD/sqrt(num))|>
   select(Gender, Race3, average, SD, lower, upper)|>
-  arrange(desc(average))|>
-print(finalgenderdat)
+  arrange(desc(average))
+kable(finalgenderdat)
 ```
 
 5. (1 point) Make a graph of showing the results from the previous exercise. Specifically, plot the averages for each group as points and confidence intervals as error bars (use the geometry `geom_errorbar`). Order the groups from lowest to highest average (the average of the males and females averages). Use `facet_wrap` to make a separate plot for females and males. Label your axes with _Race_ and _Average_ respectively, add the title _Comparing systolic blood pressure across groups_, and the caption  _Bars represent 95% confidence intervals_.
@@ -144,8 +144,8 @@ age_genderdat = dat |>
   ) |>
   mutate(lower = average - 1.96 * SD / sqrt(num),
          upper = average + 1.96 * SD / sqrt(num)) |>
-  arrange(AgeDecade) |>
-  print(age_genderdat)
+  arrange(AgeDecade)
+  kable(age_genderdat)
 
 age_genderdat |>
 ggplot(aes(x = reorder(AgeDecade, average), y = average, color = Gender)) +
@@ -166,13 +166,10 @@ Below the graph, comment on what you notice about the age distributions and how 
 
 
 ```{r}
-library(gridExtra)
-
 age_race = dat |>
   filter(!is.na(Age)) |>
   filter(!is.na(Race3)) |>
-  filter(!is.na(Gender)) |>
-print(age_race)
+  filter(!is.na(Gender))
 
 age_race |>
   ggplot(aes(x = Age, fill = Race3)) +
@@ -204,8 +201,8 @@ median_age_summary = age_race |>
   ) |>
   rename(group = Race3) |>
   select(group, median_age, children) |>
-  arrange(median_age) |>
-  print(median_age_summary)
+  arrange(median_age)
+  kable(median_age_summary)
 ```
 
 9. (1 point) Given the age distribution between two populations, we can't conclude that there are differences in SBP based just on the population averages. The observed differences are likely due to age differences rather than genetic differences. We will therefore stratify by group and then compare SBP. But before we do this, we might need redefine `dat` to avoid small groups. 
@@ -222,8 +219,7 @@ num_obser_summary = dat |>
   rename(group = Race3) |>
   rename(age_stratum = AgeDecade) |>
   arrange(num_of_individuals)
-
-print(num_obser_summary)
+  kable(num_obser_summary)
 ```
 
 10. (1 point) Based on the observations made in the previous exercise, we will redefine `dat` but with the following:
@@ -252,9 +248,7 @@ dat = dat|>
   ) |>
   filter(Race3 != "Other")|>
   mutate(Race3 = factor(Race3))|>
-  rename(Race = Race3)|>
-
-  print(dat)
+  rename(Race = Race3)
 ```
 
 11. (1 point) Create a plot that shows the average BPS for each age decade. Show the different race groups with color and lines joining them. Generate two plots: one for males and one for females.
@@ -264,8 +258,7 @@ bps_plot <- dat |>
   filter(!is.na(BPSysAve))|>
   group_by(Gender, AgeDecade, Race) |>
   summarize(
-    average = mean(BPSysAve))|>
-print(bps_plot)
+    average = mean(BPSysAve))
 
 bps_plot |>
   ggplot(aes(x = AgeDecade, y = average, color = Race, group = Race)) +
@@ -318,7 +311,7 @@ In black race, the overall average bps is higher than white race. But, overall t
 13. (1 point) For the two groups that you selected above, compute the difference in average SBP between the two groups for each age strata. Show a table with three columns representing age strata, difference for females, difference for males. 
 
 ```{r}
-bps_differ <- dat |>
+bps_differ = dat |>
   filter(!is.na(BPSysAve))|>
   filter(Race %in% c("Black", "White")) |>
   group_by(Gender, AgeDecade, Race) |>
@@ -327,7 +320,8 @@ bps_differ <- dat |>
   mutate(difference = Black - White)|>
   select(Gender, AgeDecade, difference)|>
   pivot_wider(names_from = Gender, values_from = difference, names_prefix = "Difference for ")|>
-  rename(Age_stratum = AgeDecade) |>
-  print(bps_differ)
+  rename(Age_stratum = AgeDecade)
+
+  kable(bps_differ)
 ```
 
