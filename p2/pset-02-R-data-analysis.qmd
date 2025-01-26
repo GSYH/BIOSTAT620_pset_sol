@@ -1,9 +1,48 @@
 ---
-title: "pset-02-R-data-analysis"
-format: html
+title: Problem set 2
+date: 2025-01-26
 ---
 
+Total points: 16.
+
+In these exercises, we will explore a subset of the NHANES dataset to investigate potential differences in systolic blood pressure across groups defined by self reported race.
+
+### Instructions {.unnumbered}
+
+- For each exercise, we want you to write a single line of code using the pipe (`|>`) to chain together multiple operations. This doesn't mean the code must fit within 80 characters or be written on a single physical line, but rather that the entire sequence of operations can be executed as one continuous line of code without needing to assign intermediate values or create new variables. Use this within reason. If you have a really complex calculation as a subprocess, you can create a new line of code.
+- All of your code and answers for this pset should be submitted as a single file `pset-02-R-data-analysis.qmd`.
+
+    For example, these are three separate lines of code:
+
 ```{r}
+#| eval: false
+x <- 100; x <- sqrt(x); log10(x)
+```
+
+    Whereas this is considered one line of code using the pipe:
+
+```{r}
+#| eval: false
+100 |> 
+  sqrt() |> 
+  log10()
+```
+
+
+- Copy this quarto document to edit your code for this assignment. Upon submission, you should submit both the qmd file and the rendered file generated as an html document.
+
+- For the exercises that ask to generate a graph, show the graph as well.
+
+- For exercises that require you to display tabular results, use the `kable` function to format the output as a clean, readable table. Do not display the raw dataframe directly—only show the nicely formatted table using `kable`.
+
+- Use only two significant digits for the numbers displayed in the tables.
+
+- Submit both the html and the qmd files using Git. 
+
+- You will need the following libraries:
+
+```{r}
+#| message: false
 library(dplyr)
 library(tidyr)
 library(forcats)
@@ -13,7 +52,13 @@ library(NHANES)
 options(digits = 2)
 ```
 
-1.  
+- The `.qmd` file must be able to render properly on the GSI's computer. They will already have the necessary packages installed, so there is no need to include code for installing packages. Just focus on writing the code that uses these packages.
+
+
+### Exercises {.unnumbered}
+
+
+1. (1 point) Filter the `NHANES` data to only include survey year 2011-2012. Save the resulting table in `dat`. This table should have 5,000 rows and 76 columns and can be accessed via the variable `NHANES`.
 
 ```{r}
 data("NHANES")
@@ -22,9 +67,9 @@ dat = NHANES |>
   filter(SurveyYr == "2011_12")
 ```
 
-2.  
+2. (1 point) Using `dat`, compute the average and standard deviation (SD) for the _combined systolic blood pressure_ (SBP) (given by `BPSysAve`) reading for males and females separately. Show us a data frame with two rows (female and male) and two columns (average and SD). `NA` values should be removed.
 
-```{r}
+```{r} 
 genderdat = dat|>
   filter(!is.na(dat$BPSysAve))|>
   group_by(Gender)|>
@@ -32,7 +77,11 @@ genderdat = dat|>
 print(genderdat)
 ```
 
-3.  
+3. (1 point) Because of the large difference in the average between males and females, we will perform the rest of the analysis separately for males and females. 
+
+Compute the average and SD for SBP  for each race variable in column `Race3` for females and males separately. 
+The resulting table should have four columns for sex, race, average, and SD, respectively, and 12 rows (one for each strata). 
+Arrange the result from highest to lowest average. 
 
 ```{r}
 genderdat = dat|>
@@ -43,7 +92,13 @@ genderdat = dat|>
 print(genderdat)
 ```
 
-4.  
+
+4. (1 point) Repeat the previous exercise but add two columns to the final table to show a 95% confidence interval for the mean. Specifically, add columns with the lower and upper bounds of the interval with names `lower` and `upper`, respectively. The formula for these values is 
+
+$$
+\bar{X} \pm 1.96 \, s / \sqrt{n}
+$$
+with $\bar{X}$ the sample average and $s$ the sample standard deviation. This table will simply add two more columns to the table generated in the previous exercise: one column for the lower and upper bound, respectively.
 
 ```{r}
 finalgenderdat = dat|>
@@ -59,7 +114,7 @@ finalgenderdat = dat|>
 print(finalgenderdat)
 ```
 
-5.  
+5. (1 point) Make a graph of showing the results from the previous exercise. Specifically, plot the averages for each group as points and confidence intervals as error bars (use the geometry `geom_errorbar`). Order the groups from lowest to highest average (the average of the males and females averages). Use `facet_wrap` to make a separate plot for females and males. Label your axes with _Race_ and _Average_ respectively, add the title _Comparing systolic blood pressure across groups_, and the caption  _Bars represent 95% confidence intervals_.
 
 ```{r}
 finalgenderdat |>
@@ -73,7 +128,9 @@ ggplot(aes(x = reorder(Race3, average), y = average, color = Gender)) +
       caption = "Bars represent 95% confidence intervals")
 ```
 
-6.  
+6. (2 points) In the plot above we see that the confidence intervals don't overlap when comparing the `White` and `Mexican` groups. We also see a substantial difference between `Mexican` and `Hispnanic`. Before concluding that there is a difference between groups, we will explore if differences in age, a very common _confounder_, explain the differences. 
+
+Ignoring race for now, create a table like the one in the previous exercise but show the average SBP by sex and age group (`AgeDecade`) including upper and lower bounds. The groups should be ordered chronologically. As before make a separate plot for males and females. Make sure to filter our observations with no `AgeDecade` listed.
 
 ```{r}
 age_genderdat = dat |>
@@ -101,7 +158,12 @@ ggplot(aes(x = reorder(AgeDecade, average), y = average, color = Gender)) +
       caption = "Bars represent 95% confidence intervals")
 ```
 
-7.  
+7. (2 points) We note that for both males and females the SBP increases with age. To explore if age is indeed a confounder we need to check if the groups have different age distributions.
+
+Explore the age distributions of each `Race3` group to determine if the groups are comparable. Make a histogram of `Age` for each `Race3` group and stack them vertically. Generate two columns of graphs for males and females, respectively. That is, create a grid of plots. In the histograms, create bins increments of 5 years up to 80. Make sure to give each row a seperate y-scale. 
+
+Below the graph, comment on what you notice about the age distributions and how this can explain the difference in BP between the _White_ and _Mexican_ groups.
+
 
 ```{r}
 library(gridExtra)
@@ -122,11 +184,16 @@ age_race |>
   facet_wrap( ~ Gender) +
   labs(x = "Age", title = "Age Distribution for Males and females by Race3")
 ```
+COMMENT: The age distributions is more evenly on white race as we can see from the above. The area shaded in blue are all white race. And the Mexican race is far less balance than white race. The percentage of Mexican are evenly before age 60 in females and age 45 before males. So that is the reason we see in question 6, substantial difference between Mexican and white in BP.
 
-The age distributions is more evenly on white race as we can see from the above. The area shaded in blue are all white race. And the Mexican race is far less balance than white race. The percentage of Mexican are evenly before age 60 in females and age 45 before males. So that is the reason we see in question 6, substantial difference between Mexican and white in BP.
 
 
-8.
+
+
+
+8. (1 point) Summarize the results shown in the graph by 
+compute the median age for each `Race3` group and the percent of individuals that are younger than 18. Order the rows by median age. The resulting data frame should have 6 rows (one for each group) and three columns to denote group, median age, and children respectively.
+
 ```{r}
 median_age_summary = age_race |>
   group_by(Race3) |>
@@ -140,7 +207,11 @@ median_age_summary = age_race |>
   arrange(median_age) |>
   print(median_age_summary)
 ```
-9.
+
+9. (1 point) Given the age distribution between two populations, we can't conclude that there are differences in SBP based just on the population averages. The observed differences are likely due to age differences rather than genetic differences. We will therefore stratify by group and then compare SBP. But before we do this, we might need redefine `dat` to avoid small groups. 
+
+Write code that computes the number of observations in each gender, age decade, and race combination. Show the groups with less than five observations. Make sure to remove the rows with no BPSysAve measurments before calculating the number of observations. Show a table with four columns representing gender, age stratum, group, and the number of individuals in that group. Make sure to include combinations with 0 individuals (hint: use `complete`).
+
 ```{r}
 num_obser_summary = dat |>
   filter(!is.na(BPSysAve)) |>
@@ -155,7 +226,20 @@ num_obser_summary = dat |>
 print(num_obser_summary)
 ```
 
-10.
+10. (1 point) Based on the observations made in the previous exercise, we will redefine `dat` but with the following:
+
+    * As before, include only survey year 2011-2012.
+    * Remove the observations with no age group reported.
+    * Remove the 0-9 age group and drop it as a factor in `AgeDecade`.
+    * Combine the 60-69 and 70+ age groups into a 60+ group.
+    * Remove observations reporting `Other` in `Race3` and drop it as a factor.
+    * Rename the variable `Race3` to `Race`. 
+
+    Hints: 
+
+    * Note that the levels in `AgeDecade` start with a space. 
+    * You can use the  `fct_collapse` function in the **forcats** to combine factors.
+
 ```{r}
 dat = dat|>
   filter(SurveyYr == "2011_12")|>
@@ -171,11 +255,10 @@ dat = dat|>
   rename(Race = Race3)|>
 
   print(dat)
-
-
 ```
 
-11.
+11. (1 point) Create a plot that shows the average BPS for each age decade. Show the different race groups with color and lines joining them. Generate two plots: one for males and one for females.
+ 
 ```{r}
 bps_plot <- dat |>
   filter(!is.na(BPSysAve))|>
@@ -190,9 +273,44 @@ bps_plot |>
   geom_point() +
   facet_wrap(~Gender) +
   labs(
-    title = "Average BPS by Age Decade for Males",
+    title = "Average BPS by Age Decade for Both Gender",
     x = "Age Decade",
     y = "Average BPS",
     color = "Race"
   )
 ```
+
+
+12. (2 points) Based on the plot above, pick two groups that you think are consistently different, and remake the plot from the previous exercise but just for these two groups. Add confidence intervals, and remove the lines. Put the confidence intervals for each age stratum next to each other, and use color to represent the two groups. Comment on your finding.
+
+```{r}
+bps_plot <- dat |>
+  filter(!is.na(BPSysAve))|>
+  filter(Race %in% c("Black", "White")) |>
+  group_by(Gender, AgeDecade, Race) |>
+  summarize(average = mean(BPSysAve), 
+            SD = sd(BPSysAve),
+            num = n())|>
+  mutate(lower = average - 1.96 * SD/sqrt(num),
+            upper = average + 1.96 * SD/sqrt(num))
+
+bps_plot |>
+  ggplot(aes(x = AgeDecade, y = average, color = Race, group = Race)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = lower, ymax = upper), position = "dodge") + 
+  facet_wrap(~Gender) +
+  labs(
+    title = "Average BPS by Age Decade for Both gender",
+    x = "Age Decade",
+    y = "Average BPS",
+    color = "Race"
+  )
+```
+
+
+13. (1 point) For the two groups that you selected above, compute the difference in average SBP between the two groups for each age strata. Show a table with three columns representing age strata, difference for females, difference for males. 
+
+```{r}
+## code here
+```
+
