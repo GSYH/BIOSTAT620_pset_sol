@@ -270,7 +270,6 @@ print(bps_plot)
 bps_plot |>
   ggplot(aes(x = AgeDecade, y = average, color = Race, group = Race)) +
   geom_line() +
-  geom_point() +
   facet_wrap(~Gender) +
   labs(
     title = "Average BPS by Age Decade for Both Gender",
@@ -296,7 +295,6 @@ bps_plot <- dat |>
 
 bps_plot |>
   ggplot(aes(x = AgeDecade, y = average, color = Race, group = Race)) +
-  geom_point() +
   geom_errorbar(aes(ymin = lower, ymax = upper), position = "dodge") + 
   facet_wrap(~Gender) +
   labs(
@@ -306,11 +304,30 @@ bps_plot |>
     color = "Race"
   )
 ```
+COMMENT：
+For female gender, in age group 10-19, 20-29, 40-49, 60+ are have overlap which means they are not statistically significant difference in BPS between white and black. 
+
+For male gender, in age group 10-19, 30-39, 40-49, 50-59 have almost overlap which means they are not statistically significant difference in BPS between white and black. 
+
+The male gender from 20-29 to 40-49 age group is have more slow increase in bps as age growing up. 
+
+In black race, the overall average bps is higher than white race. But, overall the average bps is increasing as age older and older.  
+
 
 
 13. (1 point) For the two groups that you selected above, compute the difference in average SBP between the two groups for each age strata. Show a table with three columns representing age strata, difference for females, difference for males. 
 
 ```{r}
-## code here
+bps_differ <- dat |>
+  filter(!is.na(BPSysAve))|>
+  filter(Race %in% c("Black", "White")) |>
+  group_by(Gender, AgeDecade, Race) |>
+  summarize(average = mean(BPSysAve))|>
+  pivot_wider(names_from = Race, values_from = average)|>
+  mutate(difference = Black - White)|>
+  select(Gender, AgeDecade, difference)|>
+  pivot_wider(names_from = Gender, values_from = difference, names_prefix = "Difference for ")|>
+  rename(Age_stratum = AgeDecade) |>
+  print(bps_differ)
 ```
 
