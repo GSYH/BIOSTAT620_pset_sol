@@ -1,0 +1,198 @@
+---
+title: "pset-02-R-data-analysis"
+format: html
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(forcats)
+library(ggplot2)
+library(knitr)
+library(NHANES)
+options(digits = 2)
+```
+
+1.  
+
+```{r}
+data("NHANES")
+
+dat = NHANES |>
+  filter(SurveyYr == "2011_12")
+```
+
+2.  
+
+```{r}
+genderdat = dat|>
+  filter(!is.na(dat$BPSysAve))|>
+  group_by(Gender)|>
+  summarize(average = mean(BPSysAve), SD = sd(BPSysAve))|>
+print(genderdat)
+```
+
+3.  
+
+```{r}
+genderdat = dat|>
+  filter(!is.na(dat$BPSysAve))|>
+  group_by(Gender, Race3)|>
+  summarize(average = mean(BPSysAve), SD = sd(BPSysAve))|>
+  arrange(desc(average))|>
+print(genderdat)
+```
+
+4.  
+
+```{r}
+finalgenderdat = dat|>
+  filter(!is.na(dat$BPSysAve))|>
+  group_by(Gender, Race3)|>
+  summarize(average = mean(BPSysAve), 
+            SD = sd(BPSysAve),
+            num = n())|>
+  mutate(lower = average - 1.96 * SD/sqrt(num),
+            upper = average + 1.96 * SD/sqrt(num))|>
+  select(Gender, Race3, average, SD, lower, upper)|>
+  arrange(desc(average))|>
+print(finalgenderdat)
+```
+
+5.  
+
+```{r}
+finalgenderdat |>
+ggplot(aes(x = reorder(Race3, average), y = average, color = Gender)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = lower, ymax = upper)) + 
+  facet_wrap(~Gender) +
+  labs(x = "Race", 
+       y = "Average", 
+       title = "Comparing systolic blood pressure across groups",
+      caption = "Bars represent 95% confidence intervals")
+```
+
+6.  
+
+```{r}
+age_genderdat = dat |>
+  filter(!is.na(BPSysAve)) |>
+  filter(!is.na(AgeDecade)) |>
+  group_by(Gender, AgeDecade) |>
+  summarize(
+    average = mean(BPSysAve),
+    SD = sd(BPSysAve),
+    num = n()
+  ) |>
+  mutate(lower = average - 1.96 * SD / sqrt(num),
+         upper = average + 1.96 * SD / sqrt(num)) |>
+  arrange(AgeDecade) |>
+  print(age_genderdat)
+
+age_genderdat |>
+ggplot(aes(x = reorder(AgeDecade, average), y = average, color = Gender)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = lower, ymax = upper)) + 
+  facet_wrap(~Gender) +
+  labs(x = "AgeDecade", 
+       y = "Average", 
+       title = "Comparing systolic blood pressure across groups",
+      caption = "Bars represent 95% confidence intervals")
+```
+
+7.  
+
+```{r}
+library(gridExtra)
+
+age_race = dat |>
+  filter(!is.na(Age)) |>
+  filter(!is.na(Race3)) |>
+  filter(!is.na(Gender)) |>
+print(age_race)
+
+age_race |>
+  ggplot(aes(x = Age, fill = Race3)) +
+  geom_histogram(
+    breaks = seq(0, 80, by = 5),
+    position = "stack",
+    color = "black"
+  ) +
+  facet_wrap( ~ Gender) +
+  labs(x = "Age", title = "Age Distribution for Males and females by Race3")
+```
+
+The age distributions is more evenly on white race as we can see from the above. The area shaded in blue are all white race. And the Mexican race is far less balance than white race. The percentage of Mexican are evenly before age 60 in females and age 45 before males. So that is the reason we see in question 6, substantial difference between Mexican and white in BP.
+
+
+8.
+```{r}
+median_age_summary = age_race |>
+  group_by(Race3) |>
+  summarize(
+    median_age = median(Age),
+    totaln = n(),
+    children = sum(Age < 18) / totaln * 100
+  ) |>
+  rename(group = Race3) |>
+  select(group, median_age, children) |>
+  arrange(median_age) |>
+  print(median_age_summary)
+```
+9.
+```{r}
+num_obser_summary = dat |>
+  filter(!is.na(BPSysAve)) |>
+  complete(Gender, AgeDecade, Race3, fill = list(num_of_individuals = 0)) |>
+  group_by(Gender, AgeDecade, Race3) |>
+  summarize(num_of_individuals = n()) |>
+  filter(num_of_individuals < 5) |>
+  rename(group = Race3) |>
+  rename(age_stratum = AgeDecade) |>
+  arrange(num_of_individuals)
+
+print(num_obser_summary)
+```
+
+10.
+```{r}
+dat = dat|>
+  filter(SurveyYr == "2011_12")|>
+  filter(!is.na(AgeDecade)) |> 
+  filter(AgeDecade != " 0-9") |> 
+  mutate(
+    AgeDecade = factor(AgeDecade),
+    AgeDecade = ifelse(AgeDecade %in% c(" 60-69", " 70+"), "60+", as.character(AgeDecade)),
+    AgeDecade = factor(AgeDecade)
+  ) |>
+  filter(Race3 != "Other")|>
+  mutate(Race3 = factor(Race3))|>
+  rename(Race = Race3)|>
+
+  print(dat)
+
+
+```
+
+11.
+```{r}
+bps_plot <- dat |>
+  filter(!is.na(BPSysAve))|>
+  group_by(Gender, AgeDecade, Race) |>
+  summarize(
+    average = mean(BPSysAve))|>
+print(bps_plot)
+
+bps_plot |>
+  ggplot(aes(x = AgeDecade, y = average, color = Race, group = Race)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Gender) +
+  labs(
+    title = "Average BPS by Age Decade for Males",
+    x = "Age Decade",
+    y = "Average BPS",
+    color = "Race"
+  )
+```
