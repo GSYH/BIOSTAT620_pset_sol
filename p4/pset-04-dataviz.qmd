@@ -60,7 +60,7 @@ For this part we want the following:
 Test that your wrangling code works. Comment the following code out:
 
 ```{r}
-source(file.path(getwd(),"./code/wrangle.R"))
+source(file.path(getwd(), "./code/wrangle.R"))
 head(population)
 ```
 
@@ -92,7 +92,7 @@ hosp =  "https://data.cdc.gov/resource/39z2-9zu6.json"
 deaths = "https://data.cdc.gov/resource/r8kw-7aab.json"
 vax = "https://data.cdc.gov/resource/rh2h-3yt2.json"
 
-source(file.path(getwd(),"./code/funcs.R"))
+source(file.path(getwd(), "./code/funcs.R"))
 
 cases_raw = get_cdc_data(cases)
 hosp_raw = get_cdc_data(hosp)
@@ -132,9 +132,13 @@ In this section, you will wrangle the files downloaded in the previous step into
 
 ```{r}
 library(lubridate)
-cases_clean  = cases_raw|> select(start_date, state, new_cases)|>
-  mutate(week = epiweek(start_date), year = epiyear(start_date), cases = as.integer(new_cases))|>
-  rename(mmwr_year = year, mmwr_week = week)|>
+cases_clean  = cases_raw |> select(start_date, state, new_cases) |>
+  mutate(
+    week = epiweek(start_date),
+    year = epiyear(start_date),
+    cases = as.integer(new_cases)
+  ) |>
+  rename(mmwr_year = year, mmwr_week = week) |>
   select(-start_date, -new_cases)
 
 head(cases_clean)
@@ -143,12 +147,15 @@ head(cases_clean)
 6.  (1 point) Now repeat the same exercise for hospitalizations. Note that you will have to collapse the data into weekly data and keep the same columns as in the cases dataset, except keep total weekly hospitalizations instead of cases. Remove weeks with less than 7 days reporting. Display your result and comment appropriately.
 
 ```{r}
-hosp_clean = hosp_raw |> select(jurisdiction, collection_date, hosp = new_covid_19_hospital)|>
-  mutate(week = epiweek(collection_date), year = epiyear(collection_date))|>
-  mutate(hosp=as.integer(hosp)) |>
-  select(-collection_date)|>
-  rename(state = jurisdiction, mmwr_year = year, mmwr_week = week)|>
-  group_by(state, mmwr_week, mmwr_year)|>
+hosp_clean = hosp_raw |> select(jurisdiction, collection_date, hosp = new_covid_19_hospital) |>
+  mutate(week = epiweek(collection_date),
+         year = epiyear(collection_date)) |>
+  mutate(hosp = as.integer(hosp)) |>
+  select(-collection_date) |>
+  rename(state = jurisdiction,
+         mmwr_year = year,
+         mmwr_week = week) |>
+  group_by(state, mmwr_week, mmwr_year) |>
   summarise(hosp = sum(hosp)) |>
   ungroup()
 
@@ -158,11 +165,11 @@ head(hosp_clean)
 7.  (1 point) Repeat what you did in the previous two exercises for provisional COVID-19 deaths. Display the result and comment appropriately.
 
 ```{r}
-deaths_clean = deaths_raw |> 
+deaths_clean = deaths_raw |>
   filter(state != "United States") |>
-  select(state, start_date, week = mmwr_week, death = covid_19_deaths)|>
+  select(state, start_date, week = mmwr_week, death = covid_19_deaths) |>
   mutate(
-    week = epiweek(start_date), 
+    week = epiweek(start_date),
     year = epiyear(start_date),
     death = as.integer(death),
     state = case_when(
@@ -171,9 +178,9 @@ deaths_clean = deaths_raw |>
       TRUE ~ state.abb[match(state, state.name)]
     )
   ) |>
-  select(-start_date)|>
-  rename(mmwr_year = year, mmwr_week = week)|>
-  group_by(state, mmwr_week, mmwr_year)|>
+  select(-start_date) |>
+  rename(mmwr_year = year, mmwr_week = week) |>
+  group_by(state, mmwr_week, mmwr_year) |>
   ungroup()
 
 head(deaths_clean)
@@ -182,15 +189,26 @@ head(deaths_clean)
 8.  (1 point) Repeat this now for vaccination data. Keep the variables `series_complete` and `booster` along with state and date. Display the result and comment appropriately. Hint: only use the rows with `date_type == 'Admin'` to only include vaccine data based on the day it was administered, rather than reported.
 
 ```{r}
-vax_clean = vax_raw|> 
-  filter(date_type == "Admin")|>
-  select(date, location, administered_cumulative, series_complete_cumulative, booster_cumulative)|>
-  mutate(week = epiweek(date), year = epiyear(date))|>
-  mutate(booster = as.integer(booster_cumulative), series = as.integer(series_complete_cumulative))|>
-  select(-date)|>
-  group_by(location, week, year)|>
-  rename(state = location, mmwr_year = year, mmwr_week = week)|>
-  summarise(boost = max(booster), series = max(series))|> ungroup()
+vax_clean = vax_raw |>
+  filter(date_type == "Admin") |>
+  select(
+    date,
+    location,
+    administered_cumulative,
+    series_complete_cumulative,
+    booster_cumulative
+  ) |>
+  mutate(week = epiweek(date), year = epiyear(date)) |>
+  mutate(
+    booster = as.integer(booster_cumulative),
+    series = as.integer(series_complete_cumulative)
+  ) |>
+  select(-date) |>
+  group_by(location, week, year) |>
+  rename(state = location,
+         mmwr_year = year,
+         mmwr_week = week) |>
+  summarise(boost = max(booster), series = max(series)) |> ungroup()
 
 head(vax_clean)
 ```
@@ -200,23 +218,20 @@ head(vax_clean)
 ```{r}
 library(tidyverse)
 ## Make dates data frame
-all_dates <- data.frame(date = seq(make_date(2020, 1, 25),
-                                   make_date(2021, 12, 31), 
-                                   by = "week")) |>
+all_dates <- data.frame(date = seq(make_date(2020, 1, 25), make_date(2021, 12, 31), by = "week")) |>
   mutate(date = ceiling_date(date, unit = "week", week_start = 7) - days(1)) |>
-  mutate(mmwr_year = epiyear(date), mmwr_week = epiweek(date)) 
+  mutate(mmwr_year = epiyear(date), mmwr_week = epiweek(date))
 
 #Uncomment to run
 
 dates_and_pop <- cross_join(all_dates, data.frame(state = unique(population$state))) |> left_join(population, by = c("state", "mmwr_year" = "year"))
 
 dat <- dates_and_pop %>%
-  left_join(cases_clean, by = c("state", "mmwr_year", "mmwr_week"))|>
-  left_join(deaths_clean, by = c("state", "mmwr_year", "mmwr_week"))|>
-  left_join(hosp_clean, by = c("state", "mmwr_year", "mmwr_week"))|>
-  left_join(vax_clean, by = c("state", "mmwr_year", "mmwr_week"))|>
+  left_join(cases_clean, by = c("state", "mmwr_year", "mmwr_week")) |>
+  left_join(deaths_clean, by = c("state", "mmwr_year", "mmwr_week")) |>
+  left_join(hosp_clean, by = c("state", "mmwr_year", "mmwr_week")) |>
+  left_join(vax_clean, by = c("state", "mmwr_year", "mmwr_week")) |>
   arrange(state, date)
-
 ```
 
 Now join all the tables to create your final table. Make sure it is ordered by date within each state. Call it `dat`. Show a few rows here.
@@ -228,77 +243,102 @@ We are now ready to create some figures. For each question below, write code tha
 10. (1 point) Plot a trend plot for cases, hospitalizations and deaths for each state. Color by region. Plot rates per $100,000$ people. Place the plots on top of each other. Hint: Use `pivot_longer` and `facet_wrap`.
 
 ```{r}
-
 dat_long <- dat %>%
   mutate(
     cases_per_100k = (as.integer(cases) / population) * 100000,
     hosp_per_100k = (as.integer(hosp) / population) * 100000,
-    deaths_per_100k = (as.integer(death) / population) * 100000) |>
-  select(date, state,region_name, cases_per_100k, hosp_per_100k, deaths_per_100k)|>
-  pivot_longer(cols = c(cases_per_100k, hosp_per_100k, deaths_per_100k),
-               names_to = "metric", values_to = "rate")
+    deaths_per_100k = (as.integer(death) / population) * 100000
+  ) |>
+  select(date,
+         state,
+         region_name,
+         cases_per_100k,
+         hosp_per_100k,
+         deaths_per_100k) |>
+  pivot_longer(
+    cols = c(cases_per_100k, hosp_per_100k, deaths_per_100k),
+    names_to = "metric",
+    values_to = "rate"
+  )
 
-ggplot(dat_long, aes(x = date, y = rate, color = region_name, group = state)) +
+ggplot(dat_long, aes(
+  x = date,
+  y = rate,
+  color = region_name,
+  group = state
+)) +
   geom_line(alpha = 0.5) +
-  facet_wrap(~ metric, scale = "free_y") +
-  labs(title = "COVID-19 Cases, Hospitalizations, and Deaths per 100,000 People",
-       x = "Date", 
-       y = "Rate per 100,000") +
+  facet_wrap( ~ metric, scale = "free_y") +
+  labs(title = "COVID-19 Cases, Hospitalizations, and Deaths per 100,000 People", x = "Date", y = "Rate per 100,000") +
   theme_minimal() +
-  theme(legend.position = "bottom",axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 11. (1 point) To determine when vaccination started and when most of the population was vaccinated, compute the percent of the US population (including DC and Puerto Rico) vaccinated by date. Do the same for the booster. Then plot both percentages.
 
 ```{r}
-us_population <- dat |>
-  summarise(total_population = sum(population, na.rm = TRUE))
+total_us_population <- sum(dat$population, na.rm = TRUE)
+
 
 vax_percent <- dat |>
-  group_by(mmwr_year, mmwr_week, date)|>
-  summarise(total_vacc = sum(series, na.rm = TRUE),
-            total_boos = sum(boost, na.rm = TRUE))|>
-  mutate(percent_vacc = (total_vacc / us_population$total_population) * 100,
-         percent_boos = (total_boos / us_population$total_population) * 100)
+  group_by(mmwr_year, mmwr_week, date) |>
+  summarise(
+    total_vacc = sum(series, na.rm = TRUE),
+    total_boos = sum(boost, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(
+    percent_vacc = (total_vacc / total_us_population) * 100,
+    percent_boos = (total_boos / total_us_population) * 100
+  )
 
-vax_percent_long <- vax_percent|>
-  pivot_longer(cols = c(percent_vacc, percent_boos),
-               names_to = "metric", values_to = "percentage")|>
+
+vax_percent_long <- vax_percent |>
+  pivot_longer(
+    cols = c(percent_vacc, percent_boos),
+    names_to = "metric",
+    values_to = "percentage"
+  )
+
 
 ggplot(vax_percent_long, aes(x = date, y = percentage, color = metric)) +
   geom_line() +
-  labs(title = "Percentage of the US Population Vaccinated",
-       x = "Date",
-       y = "Percentage (%)",
-       color = "Type") +
+  labs(
+    title = "Percentage of the US Population Vaccinated",
+    x = "Date",
+    y = "Percentage (%)",
+    color = "Type"
+  ) +
   theme_minimal() +
   theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 45, hjust = 1)) 
+        axis.text.x = element_text(angle = 45, hjust = 1))  
 ```
 
 12. (1 point) Plot the distribution of vaccination rates across states on July 1, 2021.
 
 ```{r}
-vax_july <- dat %>%
-  filter(mmwr_year == 2021, mmwr_week == epiweek(as.Date("2021-07-01"))) %>%
-  group_by(state) %>%
-  summarize(percent_vacc = mean(series / population * 100, na.rm = TRUE)) %>%
+vax_july <- dat |>
+  filter(mmwr_year == 2021, mmwr_week == epiweek(as.Date("2021-07-01"))) |>
+  group_by(state) |>
+  summarize(percent_vacc = mean(series / population * 100, na.rm = TRUE)) |>
   ungroup()
 
-
-# Plot the distribution
 ggplot(vax_july, aes(x = percent_vacc)) +
-  geom_histogram(bins = 60, fill = "blue", alpha = 0.6, color = "black") +
-  labs(title = "distribution of vaccination rates across states on July 1, 2021",
-       x = "Vaccination Rate",
-       y = "Number of States") +
+  geom_histogram(
+    bins = 60,
+    fill = "blue",
+    alpha = 0.6,
+    color = "black"
+  ) +
+  labs(title = "distribution of vaccination rates across states on July 1, 2021", x = "Vaccination Rate", y = "Number of States") +
   theme_minimal()
 ```
 
 13. (1 point) Is there a difference across region? Generate a plot of your choice.
 
 ```{r}
-vax_july <- dat %>%
+vax_july <- dat |>
   filter(mmwr_week == epiweek(as.Date("2021-07-01"))) |>
   group_by(state, region, region_name) |>
   summarize(percent_vacc = mean(series / population * 100, na.rm = TRUE))
@@ -306,9 +346,7 @@ vax_july <- dat %>%
 
 ggplot(vax_july, aes(x = region, y = percent_vacc, fill = region_name)) +
   geom_boxplot(alpha = 0.7) +
-  labs(title = "distribution of vaccination rates across states on July 1, 2021",
-       x = "region",
-       y = "Vaccination Rate") +
+  labs(title = "distribution of vaccination rates across states on July 1, 2021", x = "region", y = "Vaccination Rate") +
   theme_minimal()
 ```
 
@@ -334,51 +372,55 @@ Next, follow these steps:
     -   The **y-axis** should represent the deaths per day per 100,000 people.
 
 ```{r}
-series_period_time = dat |> 
-  filter(date >= as.Date("2021-07-01") & date <= as.Date("2021-09-30"))|>
-  group_by(state, date)|>  
+series_period_time = dat |>
+  filter(date >= as.Date("2021-07-01") &
+           date <= as.Date("2021-09-30")) |>
+  group_by(state, date) |>
   summarise(
     daily_deaths = sum(death, na.rm = TRUE),
     total_vaccinated = sum(series, na.rm = TRUE),
     population = unique(population),
     series_rate = (total_vaccinated / population) * 100
   ) |>
-  mutate(deaths_per_day_100k = (daily_deaths / population) * 100000) |> 
+  mutate(deaths_per_day_100k = (daily_deaths / population) * 100000) |>
   ungroup()
 
 
 
-ggplot(series_period_time, aes(x = series_rate, y = deaths_per_day_100k)) +
-  geom_point(color = "red", size = 1, alpha = 0.5) +
-  labs(title = "2021-07-01 to 2021-09-30 vaccination rates vs. death per daily per 100k",
-       x = "series_rate",
-       y = "deaths_per_day_100k") +
+ggplot(series_period_time,
+       aes(x = series_rate, y = deaths_per_day_100k)) +
+  geom_point(color = "red",
+             size = 1,
+             alpha = 0.5) +
+  labs(title = "2021-07-01 to 2021-09-30 vaccination rates vs. death per daily per 100k", x = "series_rate", y = "deaths_per_day_100k") +
   theme_minimal()
 
-  
+
 ```
 
 15. (1 point) Repeat the exercise for the booster.
 
 ```{r}
-booster_period_time = dat |> 
-  filter(date >= as.Date("2021-07-01") & date <= as.Date("2021-09-30"))|>
-  group_by(state, date)|>  
+booster_period_time = dat |>
+  filter(date >= as.Date("2021-07-01") &
+           date <= as.Date("2021-09-30")) |>
+  group_by(state, date) |>
   summarise(
     daily_deaths = sum(death, na.rm = TRUE),
     total_booster_vaccinated = sum(boost, na.rm = TRUE),
     population = unique(population),
     booster_rate = (total_booster_vaccinated / population) * 100
   ) |>
-  mutate(deaths_per_day_100k = (daily_deaths / population) * 100000) |> 
+  mutate(deaths_per_day_100k = (daily_deaths / population) * 100000) |>
   ungroup()
 
 
 
-ggplot(booster_period_time, aes(x = booster_rate, y = deaths_per_day_100k)) +
-  geom_point(color = "red", size = 1, alpha = 0.5) +
-  labs(title = "2021-07-01 to 2021-09-30 booster vaccination rates vs. death per daily per 100k",
-       x = "booster_rate",
-       y = "deaths_per_day_100k") +
+ggplot(booster_period_time,
+       aes(x = booster_rate, y = deaths_per_day_100k)) +
+  geom_point(color = "red",
+             size = 1,
+             alpha = 0.5) +
+  labs(title = "2021-07-01 to 2021-09-30 booster vaccination rates vs. death per daily per 100k", x = "booster_rate", y = "deaths_per_day_100k") +
   theme_minimal()
 ```
