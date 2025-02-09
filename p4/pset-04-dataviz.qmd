@@ -132,65 +132,69 @@ In this section, you will wrangle the files downloaded in the previous step into
 
 ```{r}
 library(lubridate)
-cases_raw  = cases_raw |> select(start_date, state, new_cases) |>
+
+cases_raw  = cases_raw |>
+  select(start_date, state, new_cases) |>  # Keep only relevant columns
   mutate(
     week = epiweek(start_date),
+    # Extract MMWR week from start_date
     year = epiyear(start_date),
-    cases = as.integer(new_cases)
+    # Extract MMWR year from start_date
+    cases = as.integer(new_cases) # Convert new_cases to integer for consistency
   ) |>
-  rename(mmwr_year = year, mmwr_week = week) |>
-  select(-start_date, -new_cases)
+  select(-start_date, -new_cases)  # Remove original columns 
 
-head(cases_raw)
+head(cases_raw)  # Display first few rows 
 ```
 
 6.  (1 point) Now repeat the same exercise for hospitalizations. Note that you will have to collapse the data into weekly data and keep the same columns as in the cases dataset, except keep total weekly hospitalizations instead of cases. Remove weeks with less than 7 days reporting. Display your result and comment appropriately.
 
 ```{r}
-hosp_raw = hosp_raw |> select(jurisdiction, collection_date, hosp = new_covid_19_hospital) |>
-  mutate(week = epiweek(collection_date),
-         year = epiyear(collection_date)) |>
-  mutate(hosp = as.integer(hosp)) |>
-  select(-collection_date) |>
-  rename(state = jurisdiction,
-         mmwr_year = year,
-         mmwr_week = week) |>
-  group_by(state, mmwr_week, mmwr_year) |>
-  summarise(hosp = sum(hosp)) |>
+hosp_raw = hosp_raw |> 
+  select(jurisdiction, collection_date, hosp = new_covid_19_hospital) |>  # Keep relevant columns
+  mutate(
+    week = epiweek(collection_date),  # Extract MMWR week
+    year = epiyear(collection_date),  # Extract MMWR year
+    hosp = as.integer(hosp)          # Convert hospitalizations to integer
+  ) |> 
+  select(-collection_date) |>  # Remove original date column
+  rename(state = jurisdiction) |>  # Standardize column name 
+  group_by(state, week, year) |>  # Group by state and week
+  summarise(hosp = sum(hosp)) |>  # Aggregate weekly hospitalizations
   ungroup()
 
-head(hosp_raw)
+head(hosp_raw)  # Display first few rows 
 ```
 
 7.  (1 point) Repeat what you did in the previous two exercises for provisional COVID-19 deaths. Display the result and comment appropriately.
 
 ```{r}
-deaths_raw = deaths_raw |>
-  filter(state != "United States") |>
-  select(state, start_date, week = mmwr_week, death = covid_19_deaths) |>
+deaths_raw = deaths_raw |> 
+  # filter(state != "United States") |>
+  select(state, start_date, week = mmwr_week, death = covid_19_deaths) |>  # Keep relevant columns
   mutate(
-    week = epiweek(start_date),
-    year = epiyear(start_date),
-    death = as.integer(death),
-    state = case_when(
-      state == "District of Columbia" ~ "DC",
-      state == "Puerto Rico" ~ "PR",
-      TRUE ~ state.abb[match(state, state.name)]
-    )
-  ) |>
-  select(-start_date) |>
-  rename(mmwr_year = year, mmwr_week = week) |>
-  group_by(state, mmwr_week, mmwr_year) |>
+    week = epiweek(start_date),   # Standardize to MMWR week
+    year = epiyear(start_date),   # Standardize to MMWR year
+    death = as.integer(death)     # Convert deaths to integer
+    # state = case_when(            
+    #   state == "District of Columbia" ~ "DC",
+    #   state == "Puerto Rico" ~ "PR",
+    #   TRUE ~ state.abb[match(state, state.name)]
+    # )
+  ) |> 
+  select(-start_date) |>  # Remove original date column
+  group_by(state, week, year) |>  # Prepare for aggregation 
   ungroup()
 
-head(deaths_raw)
+head(deaths_raw)  # Display first few rows
+
 ```
 
 8.  (1 point) Repeat this now for vaccination data. Keep the variables `series_complete` and `booster` along with state and date. Display the result and comment appropriately. Hint: only use the rows with `date_type == 'Admin'` to only include vaccine data based on the day it was administered, rather than reported.
 
 ```{r}
 vax_raw = vax_raw |>
-  filter(date_type == "Admin") |>
+  filter(date_type == "Admin") |>  # Keep only administered vaccination records
   select(
     date,
     location,
@@ -198,19 +202,23 @@ vax_raw = vax_raw |>
     series_complete_cumulative,
     booster_cumulative
   ) |>
-  mutate(week = epiweek(date), year = epiyear(date)) |>
-  mutate(
-    booster = as.integer(booster_cumulative),
-    series = as.integer(series_complete_cumulative)
+  mutate(week = epiweek(date), # Convert to MMWR week format
+         year = epiyear(date)   # Convert to MMWR year format
+         
   ) |>
-  select(-date) |>
-  group_by(location, week, year) |>
-  rename(state = location,
-         mmwr_year = year,
-         mmwr_week = week) |>
-  summarise(boost = max(booster), series = max(series)) |> ungroup()
-
-head(vax_raw)
+  mutate(booster = as.integer(booster_cumulative),
+           # Convert booster count to integer
+        series = as.integer(series_complete_cumulative)  # Convert completed series count to integer
+  ) |>
+  select(-date) |>  # Remove original date column
+  group_by(location, week, year) |>  # Prepare for summarize
+  rename(state = location) |>  # Standardize state column name
+  summarise(boost = max(booster), # Keep the max booster count per week
+            series = max(series)   # Keep the max completed series count per week
+  ) |>
+  ungroup()
+                     
+head(vax_raw)  # Display first few rows
 ```
 
 9.  (1 point) Now we are ready to join the tables. We will only consider 2020 and 2021 as we don't have population sizes for 2022. However, because we want to guarantee that all dates are included we will create a data frame with all possible weeks. We can use this:
@@ -226,13 +234,27 @@ all_dates <- data.frame(date = seq(make_date(2020, 1, 25), make_date(2021, 12, 3
 
 dates_and_pop <- cross_join(all_dates, data.frame(state = unique(population$state))) |> left_join(population, by = c("state", "mmwr_year" = "year"))
 
-deaths_raw <- deaths_raw |> filter(!is.na(state))# need remove united state those row to match with other states
+# deaths_raw <- deaths_raw |> filter(!is.na(state))# need remove united state those row to match with other states
 
-dat <- dates_and_pop %>%
-  left_join(cases_raw, by = c("state", "mmwr_year","mmwr_week")) |>
-  left_join(deaths_raw, by = c("state","mmwr_year","mmwr_week")) |>
-  left_join(hosp_raw, by = c("state","mmwr_year","mmwr_week")) |>
-  left_join(vax_raw, by = c("state","mmwr_year","mmwr_week"))|>
+# dat <- dates_and_pop %>%
+#   left_join(cases_raw, by = c("state", "mmwr_year","mmwr_week")) |>
+#   left_join(deaths_raw, by = c("state_name","mmwr_year","mmwr_week")) |>
+#   left_join(hosp_raw, by = c("state","mmwr_year","mmwr_week")) |>
+#   left_join(vax_raw, by = c("state","mmwr_year","mmwr_week"))|>
+#   arrange(state, date)
+
+
+
+deaths_cleaned <- deaths_raw |> #we find that death have duplicated data
+  group_by(state, year, week) |> 
+  summarise(death = sum(death))
+
+
+dat <- dates_and_pop|>
+  left_join(cases_raw, by = c("state", "mmwr_year" = "year","mmwr_week" = "week")) |>
+  left_join(hosp_raw, by = c("state","mmwr_year" = "year","mmwr_week" = "week")) |>
+  left_join(deaths_cleaned, by = c("state_name" = "state","mmwr_year" = "year","mmwr_week" = "week")) |>
+  left_join(vax_raw, by = c("state","mmwr_year" = "year","mmwr_week" = "week"))|>
   arrange(state, date)
 ```
 
@@ -270,7 +292,7 @@ ggplot(dat_long, aes(
   group = state
 )) +
   geom_line(alpha = 0.5) +
-  facet_wrap( ~ metric, scale = "free_y") +
+  facet_wrap( ~ metric, scale = "free_y", ncol = 1) +
   labs(title = "COVID-19 Cases, Hospitalizations, and Deaths per 100,000 People", x = "Date", y = "Rate per 100,000") +
   theme_minimal() +
   theme(legend.position = "bottom",
