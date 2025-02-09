@@ -527,7 +527,7 @@ The following object is masked from 'package:purrr':
 </ol>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>cases_clean  <span class="ot">=</span> cases_raw <span class="sc">|&gt;</span> <span class="fu">select</span>(start_date, state, new_cases) <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>cases_raw  <span class="ot">=</span> cases_raw <span class="sc">|&gt;</span> <span class="fu">select</span>(start_date, state, new_cases) <span class="sc">|&gt;</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">week =</span> <span class="fu">epiweek</span>(start_date),</span>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">epiyear</span>(start_date),</span>
@@ -536,7 +536,7 @@ The following object is masked from 'package:purrr':
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">mmwr_year =</span> year, <span class="at">mmwr_week =</span> week) <span class="sc">|&gt;</span></span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>start_date, <span class="sc">-</span>new_cases)</span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cases_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cases_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  state mmwr_week mmwr_year cases
 1    AZ         7      2023  3716
@@ -551,7 +551,7 @@ The following object is masked from 'package:purrr':
 <li>(1 point) Now repeat the same exercise for hospitalizations. Note that you will have to collapse the data into weekly data and keep the same columns as in the cases dataset, except keep total weekly hospitalizations instead of cases. Remove weeks with less than 7 days reporting. Display your result and comment appropriately.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>hosp_clean <span class="ot">=</span> hosp_raw <span class="sc">|&gt;</span> <span class="fu">select</span>(jurisdiction, collection_date, <span class="at">hosp =</span> new_covid_19_hospital) <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>hosp_raw <span class="ot">=</span> hosp_raw <span class="sc">|&gt;</span> <span class="fu">select</span>(jurisdiction, collection_date, <span class="at">hosp =</span> new_covid_19_hospital) <span class="sc">|&gt;</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week =</span> <span class="fu">epiweek</span>(collection_date),</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">epiyear</span>(collection_date)) <span class="sc">|&gt;</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hosp =</span> <span class="fu">as.integer</span>(hosp)) <span class="sc">|&gt;</span></span>
@@ -566,7 +566,7 @@ The following object is masked from 'package:purrr':
 <pre><code>`summarise()` has grouped output by 'state', 'mmwr_week'. You can override
 using the `.groups` argument.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hosp_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hosp_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 4
   state mmwr_week mmwr_year  hosp
@@ -583,7 +583,7 @@ using the `.groups` argument.</code></pre>
 <li>(1 point) Repeat what you did in the previous two exercises for provisional COVID-19 deaths. Display the result and comment appropriately.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>deaths_clean <span class="ot">=</span> deaths_raw <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>deaths_raw <span class="ot">=</span> deaths_raw <span class="sc">|&gt;</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">!=</span> <span class="st">"United States"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, start_date, <span class="at">week =</span> mmwr_week, <span class="at">death =</span> covid_19_deaths) <span class="sc">|&gt;</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
@@ -601,7 +601,7 @@ using the `.groups` argument.</code></pre>
 <span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, mmwr_week, mmwr_year) <span class="sc">|&gt;</span></span>
 <span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(deaths_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(deaths_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 4
   state mmwr_week death mmwr_year
@@ -618,7 +618,7 @@ using the `.groups` argument.</code></pre>
 <li>(1 point) Repeat this now for vaccination data. Keep the variables <code>series_complete</code> and <code>booster</code> along with state and date. Display the result and comment appropriately. Hint: only use the rows with <code>date_type == 'Admin'</code> to only include vaccine data based on the day it was administered, rather than reported.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>vax_clean <span class="ot">=</span> vax_raw <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>vax_raw <span class="ot">=</span> vax_raw <span class="sc">|&gt;</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date_type <span class="sc">==</span> <span class="st">"Admin"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    date,</span>
@@ -642,7 +642,7 @@ using the `.groups` argument.</code></pre>
 <pre><code>`summarise()` has grouped output by 'state', 'mmwr_week'. You can override
 using the `.groups` argument.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vax_clean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vax_raw)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 5
   state mmwr_week mmwr_year  boost series
@@ -669,12 +669,14 @@ using the `.groups` argument.</code></pre>
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>dates_and_pop <span class="ot">&lt;-</span> <span class="fu">cross_join</span>(all_dates, <span class="fu">data.frame</span>(<span class="at">state =</span> <span class="fu">unique</span>(population<span class="sc">$</span>state))) <span class="sc">|&gt;</span> <span class="fu">left_join</span>(population, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span> <span class="ot">=</span> <span class="st">"year"</span>))</span>
 <span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dates_and_pop <span class="sc">%&gt;%</span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(cases_clean, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span>, <span class="st">"mmwr_week"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(deaths_clean, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span>, <span class="st">"mmwr_week"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(hosp_clean, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span>, <span class="st">"mmwr_week"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(vax_clean, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span>, <span class="st">"mmwr_week"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(state, date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>deaths_raw <span class="ot">&lt;-</span> deaths_raw <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(state))<span class="co"># need remove united state those row to match with other states</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dates_and_pop <span class="sc">%&gt;%</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(cases_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span>,<span class="st">"mmwr_week"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(deaths_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>,<span class="st">"mmwr_year"</span>,<span class="st">"mmwr_week"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(hosp_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>,<span class="st">"mmwr_year"</span>,<span class="st">"mmwr_week"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(vax_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>,<span class="st">"mmwr_year"</span>,<span class="st">"mmwr_week"</span>))<span class="sc">|&gt;</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(state, date)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now join all the tables to create your final table. Make sure it is ordered by date within each state. Call it <code>dat</code>. Show a few rows here.</p>
 </section>
