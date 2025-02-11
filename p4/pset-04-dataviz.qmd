@@ -169,6 +169,7 @@ head(hosp_raw)  # Display first few rows
 7.  (1 point) Repeat what you did in the previous two exercises for provisional COVID-19 deaths. Display the result and comment appropriately.
 
 ```{r}
+library(readr)
 deaths_raw = deaths_raw|>
   filter(state %in% population$state_name)|> #since the state is full name, and also have united state on it, we fix it
   mutate(death = parse_number(covid_19_deaths))|> #change the name
