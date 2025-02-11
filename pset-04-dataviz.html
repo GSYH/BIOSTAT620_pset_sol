@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2025-02-09">
+
+<title>Problem set 4</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="pset-04-dataviz_files/libs/clipboard/clipboard.min.js"></script>
+<script src="pset-04-dataviz_files/libs/quarto-html/quarto.js"></script>
+<script src="pset-04-dataviz_files/libs/quarto-html/popper.min.js"></script>
+<script src="pset-04-dataviz_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="pset-04-dataviz_files/libs/quarto-html/anchor.min.js"></script>
+<link href="pset-04-dataviz_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="pset-04-dataviz_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="pset-04-dataviz_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="pset-04-dataviz_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="pset-04-dataviz_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Problem set 4</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 9, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Total points: 15.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In this problem set, we aim to use data visualization to explore the following questions:</p>
+<ol type="1">
+<li>Based on SARS-Cov-2 cases, COVID-19 deaths and hospitalizations what periods defined the worst two waves of 2020-2021?</li>
+<li>Did states with higher vaccination rates experience lower COVID-19 death rates?</li>
+<li>Were there regional differences in vaccination rates?</li>
+</ol>
+<p>We are not providing definitive answers to these questions but rather generating visualizations that may offer insights.</p>
+<section id="objective" class="level3">
+<h3 class="anchored" data-anchor-id="objective">Objective</h3>
+<p>We will create a single data frame that contains relevant observations for each jurisdiction, for each Morbidity and Mortality Weekly Report (MMWR) period in 2020 and 2021. The key outcomes of interest are:</p>
+<ul>
+<li>SARS-CoV-2 cases</li>
+<li>COVID-19 hospitalizations</li>
+<li>COVID-19 deaths</li>
+<li>Individuals receiving their first COVID-19 vaccine dose</li>
+<li>Individuals receiving a booster dose</li>
+</ul>
+</section>
+<section id="task-breakdown" class="level3">
+<h3 class="anchored" data-anchor-id="task-breakdown">Task Breakdown</h3>
+<p>Your task is divided into three parts:</p>
+<ol type="1">
+<li><strong>Download the data</strong>: Retrieve population data from the US Census API and COVID-19 statistics from the CDC API.</li>
+<li><strong>Wrangle the data</strong>: Clean and join the datasets to create a final table containing all the necessary information.</li>
+<li><strong>Create visualizations</strong>: Generate graphs to explore potential insights into the questions posed above.</li>
+</ol>
+</section>
+</section>
+<section id="instructions" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="instructions">Instructions</h2>
+<ul>
+<li><p>As usual, copy and place the <code>pset-04-dataviz.qmd</code> file in a new directory called <code>p4</code>.</p></li>
+<li><p>Within your <code>p4</code> directory, create the following directory:</p>
+<ul>
+<li><code>code</code></li>
+</ul></li>
+<li><p>Inside the <code>code</code> directory, include the following files:</p>
+<ul>
+<li><code>funcs.R</code></li>
+<li><code>wrangle.R</code></li>
+</ul></li>
+</ul>
+<p>Detailed instructions follow for each of the tasks.</p>
+</section>
+<section id="download-data" class="level2">
+<h2 class="anchored" data-anchor-id="download-data">Download data</h2>
+<p>For this part we want the following:</p>
+<ul>
+<li>Save all your code in a file called <code>wrangle.R</code> that produces the final data frame.</li>
+<li>When executed, this code should save the final data frame in an RDA file in the <code>data</code> directory.</li>
+</ul>
+<ol type="1">
+<li>(1 point) Copy the relevant code from the previous homework to create the <code>population</code> data frame. Put this code in the the <code>wrangle.R</code> file in the <code>code</code> directory. Comment the code so we know where the population is created, where the regions are read in, and where we combine these.</li>
+</ol>
+<p>Test that your wrangling code works. Comment the following code out:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">"./code/wrangle.R"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'janitor' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'janitor'
+
+The following objects are masked from 'package:stats':
+
+    chisq.test, fisher.test
+
+
+Attaching package: 'jsonlite'
+
+The following object is masked from 'package:purrr':
+
+    flatten</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(population)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  state_name  year population state region region_name   
+  &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt; &lt;chr&gt; &lt;fct&gt;  &lt;chr&gt;         
+1 Oklahoma    2020    3962031 OK    6      South Central 
+2 Oklahoma    2021    3986639 OK    6      South Central 
+3 Nebraska    2020    1961455 NE    7      Central Plains
+4 Nebraska    2021    1963692 NE    7      Central Plains
+5 Hawaii      2020    1451911 HI    9      Pacific       
+6 Hawaii      2021    1441553 HI    9      Pacific       </code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li>(1 point) In the previous problem set we wrote the following script to download cases data:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>api <span class="ot">&lt;-</span> <span class="st">"https://data.cdc.gov/resource/pwn4-m3yp.json"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cases_raw <span class="ot">&lt;-</span> <span class="fu">request</span>(api) <span class="sc">|&gt;</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">req_url_query</span>(<span class="st">"$limit"</span> <span class="ot">=</span> <span class="dv">10000000</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">req_perform</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">resp_body_json</span>(<span class="at">simplifyVector =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We are now going to download three other datasets from CDC that provide hospitalization, provisional COVID deaths, and vaccine data. A different endpoint is provided for each one, but the requests are the same otherwise. To avoid rewriting the same code more than once, write a function called <code>get_cdc_data</code> that receives and endpoint and returns a data frame. Save this code in a file called <code>funcs.R</code>.</p>
+<ol start="3" type="1">
+<li>(1 point) Use the function <code>get_cdc_data</code> to download the cases, hospitalization, deaths, and vaccination data and save the data frames. We recommend saving them into objects called: <code>cases_raw</code>, <code>hosp_raw</code>, <code>deaths_raw</code>, and <code>vax_raw</code>.</li>
+</ol>
+<ul>
+<li>cases - <code>https://data.cdc.gov/resource/pwn4-m3yp.json</code></li>
+<li>hospitalizations - <code>https://data.cdc.gov/resource/39z2-9zu6.json</code></li>
+<li>deaths - <code>https://data.cdc.gov/resource/r8kw-7aab.json</code></li>
+<li>vaccinations <code>https://data.cdc.gov/resource/rh2h-3yt2.json</code></li>
+</ul>
+<p>We recommend saving them into objects called: <code>cases_raw</code>, <code>hosp_raw</code>, <code>deaths_raw</code>, and <code>vax_raw</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cases <span class="ot">=</span> <span class="st">"https://data.cdc.gov/resource/pwn4-m3yp.json"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>hosp <span class="ot">=</span>  <span class="st">"https://data.cdc.gov/resource/39z2-9zu6.json"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>deaths <span class="ot">=</span> <span class="st">"https://data.cdc.gov/resource/r8kw-7aab.json"</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>vax <span class="ot">=</span> <span class="st">"https://data.cdc.gov/resource/rh2h-3yt2.json"</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">"./code/funcs.R"</span>))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>cases_raw <span class="ot">=</span> <span class="fu">get_cdc_data</span>(cases)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>hosp_raw <span class="ot">=</span> <span class="fu">get_cdc_data</span>(hosp)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>deaths_raw <span class="ot">=</span> <span class="fu">get_cdc_data</span>(deaths)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>vax_raw <span class="ot">=</span> <span class="fu">get_cdc_data</span>(vax)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Take a look at all the dataframes you just read in.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Uncomment this to run this</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(cases_raw))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             date_updated state              start_date                end_date
+1 2023-02-23T00:00:00.000    AZ 2023-02-16T00:00:00.000 2023-02-22T00:00:00.000
+2 2022-12-22T00:00:00.000    LA 2022-12-15T00:00:00.000 2022-12-21T00:00:00.000
+3 2023-02-23T00:00:00.000    GA 2023-02-16T00:00:00.000 2023-02-22T00:00:00.000
+4 2023-03-30T00:00:00.000    LA 2023-03-23T00:00:00.000 2023-03-29T00:00:00.000
+5 2023-02-02T00:00:00.000    LA 2023-01-26T00:00:00.000 2023-02-01T00:00:00.000
+6 2023-03-23T00:00:00.000    LA 2023-03-16T00:00:00.000 2023-03-22T00:00:00.000
+  tot_cases new_cases tot_deaths new_deaths new_historic_cases
+1 2434631.0    3716.0    33042.0       39.0              23150
+2 1507707.0    4041.0    18345.0       21.0              21397
+3 3061141.0    5298.0    42324.0       88.0               6800
+4 1588259.0    2203.0    18858.0       23.0               5347
+5 1548508.0    5725.0    18572.0       47.0               4507
+6 1580709.0    1961.0    18835.0       35.0               2239
+  new_historic_deaths
+1                   0
+2                   0
+3                   0
+4                   0
+5                   0
+6                   0</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(hosp_raw))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          collection_date jurisdiction new_covid_19_hospital
+1 2023-09-23T00:00:00.000     Region 5                   418
+2 2023-09-24T00:00:00.000     Region 5                   319
+3 2023-09-25T00:00:00.000     Region 5                   365
+4 2023-09-26T00:00:00.000     Region 5                   407
+5 2023-09-27T00:00:00.000     Region 5                   414
+6 2023-09-28T00:00:00.000     Region 5                   377
+  new_covid_19_hospital_1 cumulative_covid_19_hospital
+1      389.14285714285717                      1032508
+2       389.2857142857143                      1032827
+3                   395.0                      1033192
+4      395.14285714285717                      1033599
+5       395.7142857142857                      1034013
+6      389.42857142857144                      1034390
+  cumulative_covid_19_hospital_1 new_covid_19_hospital_2
+1             1965.1074606644204      5.1844176731317155
+2             1965.7145932773901      5.1863209101629675
+3              1966.409274793797       5.262450391413067
+4             1967.1838922655168       5.264353628444319
+5             1967.9718323964555       5.271966576569329
+6             1968.6893527572374        5.18822414719422
+  new_covid_19_hospital_3 new_covid_19_hospital_4 total_hospitalized_covid
+1      5.1844176731317155      5.1844176731317155                     2068
+2      5.1863209101629675      5.1863209101629675                     2083
+3       5.262450391413067       5.262450391413067                     2174
+4       5.264353628444319       5.264353628444319                     2152
+5       5.271966576569329       5.271966576569329                     2162
+6        5.18822414719422        5.18822414719422                     2093
+  total_hospitalized_covid_1 covid_19_inpatient_bed covid_19_inpatient_bed_1
+1          1.870273923891379      1.870273923891379      0.09361361930724477
+2         1.8851070852003566     1.8851070852003566      0.09186845392105569
+3         1.9075027355011414     1.9075027355011414      0.10331496654982586
+4         1.9255064482138189     1.9255064482138189      0.10896499704873186
+5         1.9394246936011394     1.9394246936011394      0.11411168394863225
+6         1.9398872335133022     1.9398872335133022      0.10257298885314814
+  covid_19_icu_bed_occupancy covid_19_icu_bed_occupancy_1
+1          1.870273923891379          0.04724889876464955
+2         1.8851070852003566          0.05957545544748699
+3         1.9075027355011414         0.047553279295471595
+4         1.9255064482138189         0.053978273053001846
+5         1.9394246936011394          0.07890068573990994
+6         1.9398872335133022          0.08368752552323033</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(deaths_raw))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               data_as_of              start_date                end_date
+1 2025-02-06T00:00:00.000 2019-12-29T00:00:00.000 2020-01-04T00:00:00.000
+2 2025-02-06T00:00:00.000 2020-01-05T00:00:00.000 2020-01-11T00:00:00.000
+3 2025-02-06T00:00:00.000 2020-01-12T00:00:00.000 2020-01-18T00:00:00.000
+4 2025-02-06T00:00:00.000 2020-01-19T00:00:00.000 2020-01-25T00:00:00.000
+5 2025-02-06T00:00:00.000 2020-01-26T00:00:00.000 2020-02-01T00:00:00.000
+6 2025-02-06T00:00:00.000 2020-02-02T00:00:00.000 2020-02-08T00:00:00.000
+    group      year mmwr_week        week_ending_date         state
+1 By Week 2019/2020         1 2020-01-04T00:00:00.000 United States
+2 By Week      2020         2 2020-01-11T00:00:00.000 United States
+3 By Week      2020         3 2020-01-18T00:00:00.000 United States
+4 By Week      2020         4 2020-01-25T00:00:00.000 United States
+5 By Week      2020         5 2020-02-01T00:00:00.000 United States
+6 By Week      2020         6 2020-02-08T00:00:00.000 United States
+  covid_19_deaths total_deaths percent_of_expected_deaths pneumonia_deaths
+1               0        60170                      98.00             4111
+2               1        60734                      97.00             4153
+3               2        59362                      98.00             4066
+4               3        59162                      99.00             3915
+5               0        58834                      99.00             3818
+6               4        59482                        100             3823
+  pneumonia_and_covid_19_deaths influenza_deaths
+1                             0              434
+2                             1              475
+3                             2              468
+4                             0              500
+5                             0              481
+6                             1              520
+  pneumonia_influenza_or_covid_19_deaths footnote month
+1                                   4545     &lt;NA&gt;  &lt;NA&gt;
+2                                   4628     &lt;NA&gt;  &lt;NA&gt;
+3                                   4534     &lt;NA&gt;  &lt;NA&gt;
+4                                   4418     &lt;NA&gt;  &lt;NA&gt;
+5                                   4299     &lt;NA&gt;  &lt;NA&gt;
+6                                   4346     &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(vax_raw))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     date date_type mmwr_week location administered_daily
+1 2023-05-10T00:00:00.000    Report        19       CO              15097
+2 2023-05-10T00:00:00.000    Report        19       AZ              16505
+3 2023-05-10T00:00:00.000    Report        19       MN              16020
+4 2023-05-10T00:00:00.000    Report        19       ID               3526
+5 2023-05-10T00:00:00.000    Report        19       DC                 31
+6 2023-05-10T00:00:00.000    Report        19       AK               1582
+  administered_cumulative admin_dose_1_daily admin_dose_1_cumulative
+1                13033446               1527                 4837792
+2                14647405               2955                 5704677
+3                12829141               1282                 4461994
+4                 2894361                323                 1146055
+5                 2137377                264                  836680
+6                 1328221                130                  535718
+  administered_dose1_pop_pct series_complete_daily series_complete_cumulative
+1                       84.0                  1218                    4248431
+2                       78.4                  1101                    4821350
+3                       79.1                   932                    4082263
+4                       64.1                   267                    1012257
+5                       95.0                   212                     644085
+6                       73.2                    86                     477592
+  series_complete_pop_pct booster_daily booster_cumulative
+1                    73.8          1569            2460212
+2                    66.2          1401            2418342
+3                    72.4          1698            2595884
+4                    56.6           333             494214
+5                    91.3           196             330888
+6                    65.3           158             237614
+  additional_doses_vax_pct second_booster_50plus_daily
+1                     57.9                        1062
+2                     50.2                        1312
+3                     63.6                        1196
+4                     48.8                         281
+5                     51.4                         106
+6                     49.8                         164
+  second_booster_50plus_cumulative second_booster_50plus_vax_pct
+1                           794838                          62.9
+2                           794699                          54.3
+3                           983284                          67.8
+4                           173862                          54.8
+5                            80880                          55.9
+6                            69502                          54.7
+  bivalent_booster_daily bivalent_booster_cumulative bivalent_booster_pop_pct
+1                   9725                     1272115                     22.1
+2                  11388                     1148060                     15.8
+3                   5497                     1510743                     26.8
+4                   2032                      248989                     13.9
+5                    509                      226857                     32.1
+6                    640                      103624                     14.2
+  administered_7_day_rolling admin_dose_1_day_rolling
+1                       &lt;NA&gt;                     &lt;NA&gt;
+2                       &lt;NA&gt;                     &lt;NA&gt;
+3                       &lt;NA&gt;                     &lt;NA&gt;
+4                       &lt;NA&gt;                     &lt;NA&gt;
+5                       &lt;NA&gt;                     &lt;NA&gt;
+6                       &lt;NA&gt;                     &lt;NA&gt;
+  series_complete_day_rolling booster_7_day_rolling_average
+1                        &lt;NA&gt;                          &lt;NA&gt;
+2                        &lt;NA&gt;                          &lt;NA&gt;
+3                        &lt;NA&gt;                          &lt;NA&gt;
+4                        &lt;NA&gt;                          &lt;NA&gt;
+5                        &lt;NA&gt;                          &lt;NA&gt;
+6                        &lt;NA&gt;                          &lt;NA&gt;
+  second_booster_50plus_7_day_rolling_average
+1                                        &lt;NA&gt;
+2                                        &lt;NA&gt;
+3                                        &lt;NA&gt;
+4                                        &lt;NA&gt;
+5                                        &lt;NA&gt;
+6                                        &lt;NA&gt;
+  bivalent_booster_7_day_rolling_average administered_daily_change
+1                                   &lt;NA&gt;                      &lt;NA&gt;
+2                                   &lt;NA&gt;                      &lt;NA&gt;
+3                                   &lt;NA&gt;                      &lt;NA&gt;
+4                                   &lt;NA&gt;                      &lt;NA&gt;
+5                                   &lt;NA&gt;                      &lt;NA&gt;
+6                                   &lt;NA&gt;                      &lt;NA&gt;
+  administered_daily_change_1
+1                        &lt;NA&gt;
+2                        &lt;NA&gt;
+3                        &lt;NA&gt;
+4                        &lt;NA&gt;
+5                        &lt;NA&gt;
+6                        &lt;NA&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="wrangling-challenge" class="level2">
+<h2 class="anchored" data-anchor-id="wrangling-challenge">Wrangling Challenge</h2>
+<p>In this section, you will wrangle the files downloaded in the previous step into a single data frame containing all the necessary information. We recommend using the following column names: <code>date</code>, <code>state</code>, <code>cases</code>, <code>hosp</code>, <code>deaths</code>, <code>vax</code>, <code>booster</code>, and <code>population</code>.</p>
+<section id="key-considerations" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="key-considerations">Key Considerations</h3>
+<ul>
+<li><p><strong>Align reporting periods</strong>: Ensure that the time periods for which each outcome is reported are consistent. Specifically, calculate the totals for each Morbidity and Mortality Weekly Report (MMWR) period.</p></li>
+<li><p><strong>Harmonize variable names</strong>: To facilitate the joining of datasets, rename variables so that they match across all datasets.</p></li>
+</ul>
+<ol start="4" type="1">
+<li>(1 point) One challenge is data frames use different column names to represent the same variable. Examine each data frame and report back 1) the name of the column with state abbreviations, 2) if the rate is yearly, monthly, or weekly, daily data, 3) all the column names that provide date information.</li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 27%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Outcome</th>
+<th>Jurisdiction variable name</th>
+<th>Rate</th>
+<th>time variable names</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cases</td>
+<td>“state”</td>
+<td>weekly</td>
+<td>“start_date”</td>
+</tr>
+<tr class="even">
+<td>hospitalizations</td>
+<td>“jurisdiction”</td>
+<td>“daily”</td>
+<td>“collection_date”</td>
+</tr>
+<tr class="odd">
+<td>deaths</td>
+<td>“state”</td>
+<td>weekly</td>
+<td>“year”, “week_ending_date”</td>
+</tr>
+<tr class="even">
+<td>vaccines</td>
+<td>“location”</td>
+<td>“daily”</td>
+<td>“date”</td>
+</tr>
+</tbody>
+</table>
+<ol start="5" type="1">
+<li>(1 point) Wrangle the cases data frame to keep state, MMWR year, MMWR week, and the total number of cases for that week in that state. Keep only states for which we have population estimates. Hint: Use <code>as_date</code>, <code>ymd_hms</code>, <code>epiweek</code> and <code>epiyear</code> functions in the <strong>lubridate</strong> package. Comment appropriately. Display the result.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>cases_raw  <span class="ot">=</span> cases_raw <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(start_date, state, new_cases) <span class="sc">|&gt;</span>  <span class="co"># Keep only relevant columns</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">week =</span> <span class="fu">epiweek</span>(start_date),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract MMWR week from start_date</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">epiyear</span>(start_date),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract MMWR year from start_date</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">cases =</span> <span class="fu">as.integer</span>(new_cases) <span class="co"># Convert new_cases to integer for consistency</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>start_date, <span class="sc">-</span>new_cases)  <span class="co"># Remove original columns </span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cases_raw)  <span class="co"># Display first few rows </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  state week year cases
+1    AZ    7 2023  3716
+2    LA   50 2022  4041
+3    GA    7 2023  5298
+4    LA   12 2023  2203
+5    LA    4 2023  5725
+6    LA   11 2023  1961</code></pre>
+</div>
+</div>
+<ol start="6" type="1">
+<li>(1 point) Now repeat the same exercise for hospitalizations. Note that you will have to collapse the data into weekly data and keep the same columns as in the cases dataset, except keep total weekly hospitalizations instead of cases. Remove weeks with less than 7 days reporting. Display your result and comment appropriately.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>hosp_raw <span class="ot">=</span> hosp_raw <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(jurisdiction, collection_date, <span class="at">hosp =</span> new_covid_19_hospital) <span class="sc">|&gt;</span>  <span class="co"># Keep relevant columns</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">week =</span> <span class="fu">epiweek</span>(collection_date),  <span class="co"># Extract MMWR week</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">epiyear</span>(collection_date),  <span class="co"># Extract MMWR year</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">hosp =</span> <span class="fu">as.integer</span>(hosp)          <span class="co"># Convert hospitalizations to integer</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>collection_date) <span class="sc">|&gt;</span>  <span class="co"># Remove original date column</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">state =</span> jurisdiction) <span class="sc">|&gt;</span>  <span class="co"># Standardize column name </span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state, week, year) <span class="sc">|&gt;</span>  <span class="co"># Group by state and week</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">hosp =</span> <span class="fu">sum</span>(hosp)) <span class="sc">|&gt;</span>  <span class="co"># Aggregate weekly hospitalizations</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'state', 'week'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hosp_raw)  <span class="co"># Display first few rows </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  state  week  year  hosp
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+1 AK        1  2021    76
+2 AK        1  2022    88
+3 AK        1  2023    39
+4 AK        1  2024    36
+5 AK        2  2021    54
+6 AK        2  2022   117</code></pre>
+</div>
+</div>
+<ol start="7" type="1">
+<li>(1 point) Repeat what you did in the previous two exercises for provisional COVID-19 deaths. Display the result and comment appropriately.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>deaths_raw <span class="ot">=</span> deaths_raw<span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">%in%</span> population<span class="sc">$</span>state_name)<span class="sc">|&gt;</span> <span class="co">#since the state is full name, and also have united state on it, we fix it</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">death =</span> <span class="fu">parse_number</span>(covid_19_deaths))<span class="sc">|&gt;</span> <span class="co">#change the name</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">as_date</span>(<span class="fu">ymd_hms</span>(end_date)))<span class="sc">|&gt;</span> <span class="co">#convert date</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mmwr_year =</span> <span class="fu">epiyear</span>(date),<span class="at">mmwr_week =</span> <span class="fu">as.numeric</span>(mmwr_week))<span class="sc">|&gt;</span> <span class="co">#convert date and convert mmwr_week to numeric</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state, mmwr_week, mmwr_year, death)<span class="sc">|&gt;</span> <span class="co">#select needed variables </span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(state, mmwr_year, mmwr_week)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ol start="8" type="1">
+<li>(1 point) Repeat this now for vaccination data. Keep the variables <code>series_complete</code> and <code>booster</code> along with state and date. Display the result and comment appropriately. Hint: only use the rows with <code>date_type == 'Admin'</code> to only include vaccine data based on the day it was administered, rather than reported.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>vax_raw <span class="ot">=</span> vax_raw <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date_type <span class="sc">==</span> <span class="st">"Admin"</span>) <span class="sc">|&gt;</span>  <span class="co"># Keep only administered vaccination records</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    date,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    location,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    administered_cumulative,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    series_complete_cumulative,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    booster_cumulative</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">week =</span> <span class="fu">epiweek</span>(date), <span class="co"># Convert to MMWR week format</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">epiyear</span>(date)   <span class="co"># Convert to MMWR year format</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">booster =</span> <span class="fu">as.integer</span>(booster_cumulative),</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>           <span class="co"># Convert booster count to integer</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">series =</span> <span class="fu">as.integer</span>(series_complete_cumulative)  <span class="co"># Convert completed series count to integer</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>date) <span class="sc">|&gt;</span>  <span class="co"># Remove original date column</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(location, week, year) <span class="sc">|&gt;</span>  <span class="co"># Prepare for summarize</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">state =</span> location) <span class="sc">|&gt;</span>  <span class="co"># Standardize state column name</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">boost =</span> <span class="fu">max</span>(booster), <span class="co"># Keep the max booster count per week</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">series =</span> <span class="fu">max</span>(series)   <span class="co"># Keep the max completed series count per week</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'state', 'week'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(vax_raw)  <span class="co"># Display first few rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  state  week  year  boost series
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;int&gt;  &lt;int&gt;
+1 AK        1  2021      0   8396
+2 AK        1  2022 168597 449087
+3 AK        1  2023 234178 476209
+4 AK        2  2021      0  13560
+5 AK        2  2022 176901 450884
+6 AK        2  2023 234589 476376</code></pre>
+</div>
+</div>
+<ol start="9" type="1">
+<li>(1 point) Now we are ready to join the tables. We will only consider 2020 and 2021 as we don’t have population sizes for 2022. However, because we want to guarantee that all dates are included we will create a data frame with all possible weeks. We can use this:</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Make dates data frame</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>all_dates <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">date =</span> <span class="fu">seq</span>(<span class="fu">make_date</span>(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">25</span>), <span class="fu">make_date</span>(<span class="dv">2021</span>, <span class="dv">12</span>, <span class="dv">31</span>), <span class="at">by =</span> <span class="st">"week"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">ceiling_date</span>(date, <span class="at">unit =</span> <span class="st">"week"</span>, <span class="at">week_start =</span> <span class="dv">7</span>) <span class="sc">-</span> <span class="fu">days</span>(<span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mmwr_year =</span> <span class="fu">epiyear</span>(date), <span class="at">mmwr_week =</span> <span class="fu">epiweek</span>(date))</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Uncomment to run</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>dates_and_pop <span class="ot">&lt;-</span> <span class="fu">cross_join</span>(all_dates, <span class="fu">data.frame</span>(<span class="at">state =</span> <span class="fu">unique</span>(population<span class="sc">$</span>state))) <span class="sc">|&gt;</span> <span class="fu">left_join</span>(population, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span> <span class="ot">=</span> <span class="st">"year"</span>))</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> dates_and_pop<span class="sc">|&gt;</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(cases_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_week"</span> <span class="ot">=</span> <span class="st">"week"</span>,<span class="st">"mmwr_year"</span> <span class="ot">=</span> <span class="st">"year"</span>))<span class="sc">|&gt;</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(hosp_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span> <span class="ot">=</span> <span class="st">"year"</span>,<span class="st">"mmwr_week"</span> <span class="ot">=</span> <span class="st">"week"</span>))<span class="sc">|&gt;</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(deaths_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state_name"</span> <span class="ot">=</span> <span class="st">"state"</span>, <span class="st">"mmwr_year"</span>,<span class="st">"mmwr_week"</span>))<span class="sc">|&gt;</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(vax_raw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"state"</span>, <span class="st">"mmwr_year"</span> <span class="ot">=</span> <span class="st">"year"</span>,<span class="st">"mmwr_week"</span> <span class="ot">=</span> <span class="st">"week"</span>))<span class="sc">|&gt;</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date, state)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now join all the tables to create your final table. Make sure it is ordered by date within each state. Call it <code>dat</code>. Show a few rows here.</p>
+</section>
+</section>
+<section id="data-visualization-generate-some-plots" class="level2">
+<h2 class="anchored" data-anchor-id="data-visualization-generate-some-plots">Data visualization: generate some plots</h2>
+<p>We are now ready to create some figures. For each question below, write code that generates a plot that addresses the question.</p>
+<ol start="10" type="1">
+<li>(1 point) Plot a trend plot for cases, hospitalizations and deaths for each state. Color by region. Plot rates per <span class="math inline">\(100,000\)</span> people. Place the plots on top of each other. Hint: Use <code>pivot_longer</code> and <code>facet_wrap</code>.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">=</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cases_rate =</span> (cases <span class="sc">/</span> population) <span class="sc">*</span> <span class="dv">100000</span>,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">hosp_rate =</span> (hosp <span class="sc">/</span> population) <span class="sc">*</span> <span class="dv">100000</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">deaths_rate =</span> (death <span class="sc">/</span> population) <span class="sc">*</span> <span class="dv">100000</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(cases_rate, hosp_rate, deaths_rate),</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"name"</span>,</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"rate"</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat1,<span class="fu">aes</span>(</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> date,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> rate,</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">group =</span> state,</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">color =</span> <span class="fu">factor</span>(region)</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>)) <span class="sc">+</span></span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">show.legend =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">facet_wrap</span>( <span class="sc">~</span> name, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pset-04-dataviz_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="11" type="1">
+<li>(1 point) To determine when vaccination started and when most of the population was vaccinated, compute the percent of the US population (including DC and Puerto Rico) vaccinated by date. Do the same for the booster. Then plot both percentages.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>total_us_population <span class="ot">&lt;-</span> <span class="fu">sum</span>(dat<span class="sc">$</span>population, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>vax_percent <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(mmwr_year, mmwr_week, date) <span class="sc">|&gt;</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_vacc =</span> <span class="fu">sum</span>(series, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_boos =</span> <span class="fu">sum</span>(boost, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_vacc =</span> (total_vacc <span class="sc">/</span> total_us_population) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_boos =</span> (total_boos <span class="sc">/</span> total_us_population) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>vax_percent_long <span class="ot">&lt;-</span> vax_percent <span class="sc">|&gt;</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(percent_vacc, percent_boos),</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"metric"</span>,</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"percentage"</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vax_percent_long, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> percentage, <span class="at">color =</span> metric)) <span class="sc">+</span></span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Percentage of the US Population Vaccinated"</span>,</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Date"</span>,</span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage (%)"</span>,</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Type"</span></span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pset-04-dataviz_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="12" type="1">
+<li>(1 point) Plot the distribution of vaccination rates across states on July 1, 2021.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>vax_july <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mmwr_year <span class="sc">==</span> <span class="dv">2021</span>, mmwr_week <span class="sc">==</span> <span class="fu">epiweek</span>(<span class="fu">as.Date</span>(<span class="st">"2021-07-01"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percent_vacc =</span> (series<span class="sc">/</span>population)<span class="sc">*</span><span class="dv">100</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vax_july, <span class="fu">aes</span>(<span class="at">x =</span> state,  <span class="at">y =</span> percent_vacc, <span class="at">fill =</span> state)) <span class="sc">+</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"distribution of vaccination rates across states on July 1, 2021"</span>, <span class="at">x =</span> <span class="st">"state"</span>, <span class="at">y =</span> <span class="st">"Percent Vaccinated"</span>) <span class="sc">+</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pset-04-dataviz_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="13" type="1">
+<li>(1 point) Is there a difference across region? Generate a plot of your choice.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>vax_july <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mmwr_week <span class="sc">==</span> <span class="fu">epiweek</span>(<span class="fu">as.Date</span>(<span class="st">"2021-07-01"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(region) <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_population =</span> <span class="fu">sum</span>(population, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_vaccinated =</span> <span class="fu">sum</span>(series, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_vacc =</span> (total_vaccinated <span class="sc">/</span> total_population) <span class="sc">*</span> <span class="dv">10</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(vax_july, <span class="fu">aes</span>(<span class="at">x =</span> region, <span class="at">y =</span> percent_vacc, <span class="at">fill =</span> <span class="fu">factor</span>(region))) <span class="sc">+</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"distribution of vaccination rates across states on July 1, 2021"</span>, <span class="at">x =</span> <span class="st">"region"</span>, <span class="at">y =</span> <span class="st">"Vaccination Rate"</span>) <span class="sc">+</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pset-04-dataviz_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Discuss what the plot shows.</p>
+<p>Yes, there are difference across region. We can see from the graph that different region have different vaccination rate.</p>
+<ol start="14" type="1">
+<li>(1 point) Using the previous figures, identify a time period that meets the following criteria:</li>
+</ol>
+<ul>
+<li>A significant COVID-19 wave occurred across the United States.</li>
+<li>A sufficient number of people had been vaccinated.</li>
+</ul>
+<p>Next, follow these steps:</p>
+<ul>
+<li>For each state, calculate the <strong>COVID-19 deaths per day per 100,000 people</strong> during the selected time period.</li>
+<li>Determine the <strong>vaccination rate (primary series)</strong> in each state as of the last day of the period.</li>
+<li>Create a scatter plot to visualize the relationship between these two variables:
+<ul>
+<li>The <strong>x-axis</strong> should represent the vaccination rate.</li>
+<li>The <strong>y-axis</strong> should represent the deaths per day per 100,000 people.</li>
+</ul></li>
+</ul>
+<p>Time period: 2021-07-01 to 2021-09-30</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>series_period_time <span class="ot">=</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&gt;=</span> <span class="fu">as.Date</span>(<span class="st">"2021-07-01"</span>) <span class="sc">&amp;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>           date <span class="sc">&lt;=</span> <span class="fu">as.Date</span>(<span class="st">"2021-09-30"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state) <span class="sc">|&gt;</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">daily_deaths =</span> <span class="fu">sum</span>(death, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">days =</span> <span class="fu">n</span>()<span class="sc">*</span><span class="dv">7</span>,</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_vaccinated =</span> <span class="fu">max</span>(series, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">population =</span> <span class="fu">unique</span>(population),</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">deaths_per_day_100k =</span> (daily_deaths <span class="sc">/</span> days) <span class="sc">*</span><span class="dv">100000</span> <span class="sc">/</span> (population)</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a> <span class="fu">mutate</span>(<span class="at">series_rate =</span> (total_vaccinated<span class="sc">/</span>population)<span class="sc">*</span><span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(series_period_time,</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> series_rate, <span class="at">y =</span> deaths_per_day_100k, <span class="at">color =</span> state)) <span class="sc">+</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"2021-07-01 to 2021-09-30 vaccination rates vs. death per daily per 100k"</span>, <span class="at">x =</span> <span class="st">"vaccination rate"</span>, <span class="at">y =</span> <span class="st">"deaths per day per 100,000 people"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pset-04-dataviz_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="15" type="1">
+<li>(1 point) Repeat the exercise for the booster.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>booster_period_time <span class="ot">=</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">&gt;=</span> <span class="fu">as.Date</span>(<span class="st">"2021-07-01"</span>) <span class="sc">&amp;</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>           date <span class="sc">&lt;=</span> <span class="fu">as.Date</span>(<span class="st">"2021-09-30"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state) <span class="sc">|&gt;</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">daily_deaths =</span> <span class="fu">sum</span>(death, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">days =</span> <span class="fu">n</span>()<span class="sc">*</span><span class="dv">7</span>,</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_booster_vaccinated =</span> <span class="fu">max</span>(boost, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">population =</span> <span class="fu">unique</span>(population),</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">deaths_per_day_100k =</span> (daily_deaths <span class="sc">/</span> days) <span class="sc">*</span><span class="dv">100000</span> <span class="sc">/</span> (population)</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">booster_rate =</span> (total_booster_vaccinated<span class="sc">/</span>population)<span class="sc">*</span><span class="dv">100</span>) <span class="sc">|&gt;</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(booster_period_time,</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> booster_rate, <span class="at">y =</span> deaths_per_day_100k, <span class="at">color =</span> state)) <span class="sc">+</span></span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"2021-07-01 to 2021-09-30 booster vaccination rates vs. death per daily per 100k"</span>, <span class="at">x =</span> <span class="st">"booster rate"</span>, <span class="at">y =</span> <span class="st">"deaths per day per 100,000 people"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pset-04-dataviz_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
