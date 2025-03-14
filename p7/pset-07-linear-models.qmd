@@ -122,10 +122,7 @@ library(excessmort)
 library(lubridate)
 data("puerto_rico_counts")
 counts = puerto_rico_counts |>
-  filter(date >= make_date(2002,1,1) & date <= make_date(2017,12,31))
-  
-counts = counts |>
-  filter(agegroup %in% c("60-64", "65-69", "70-74", "75-79", "80-84", "85-Inf"))
+  filter(year(date) >= 2002 & year(date) <= 2017, agegroup %in% c("60-64", "65-69", "70-74", "75-79", "80-84", "85-Inf"))
 ```
 
 
@@ -182,15 +179,16 @@ The younger age group population had decreased at a certain point which also got
 
 
 ```{r}
-weekly_counts <- weekly_counts|>
-  mutate(mortality_rate = (outcome / population) * 100000)
+weekly_count_box <- weekly_counts|>
+  group_by(date, week)|>
+  summarise(mortality_rate = (sum(outcome) / sum(population)) * 1000)
 
 
 
-mortality_0216 = weekly_counts|>
+mortality_0216 = weekly_count_box|>
   filter(year(date) >= 2002 & year(date) <= 2016)
 
-mortality_17 = weekly_counts|>
+mortality_17 = weekly_count_box|>
   filter(year(date) == 2017)
 
 ggplot(mortality_0216, aes(x = factor(week), y = mortality_rate)) + geom_boxplot() + geom_point(data = mortality_17, aes(x = factor(week), y = mortality_rate), color = "red", size = 2, position = position_jitter(width = 0.2, height = 0)) + theme_classic()
@@ -200,17 +198,13 @@ ggplot(mortality_0216, aes(x = factor(week), y = mortality_rate)) + geom_boxplot
 14. Note two things: 1) there is a strong week effect and 2) 2017 is lower than expected. Plot the yearly rates (per 1,000)  for 2002-2016:
 
 ```{r}
-yearly_rates <- weekly_counts |> 
+weekly_counts |> 
   filter(year(date) < 2017) |>  
-  group_by(year = year(date)) |>  
-  summarise(
-    total_outcome = sum(outcome),  
-    total_population = sum(population),  
-    mortality_rate = (total_outcome / total_population) * 1000  
-  )
-
-ggplot(yearly_rates, aes(x = year, y = mortality_rate)) +
-  geom_line() +  geom_point()
+  group_by(date)|>
+  summarise(outcome = sum(outcome),  population =  mean(population))|>
+  group_by(year = year(date))|>
+  summarise(rate = sum(outcome)/sum(population)*1000)|>
+  ggplot(aes(x = year, y = rate)) + geom_line()
 ```
 
 15. The plot made in 14 explains why 2017 is below what is expected: there appears to be a general decrease in mortality with time. A possible explanation is that medical care is improving and people are living more healthy lives.
@@ -226,9 +220,9 @@ Use rate as the outcome in the model.
 
 ```{r}
 weekly_counts_model <- weekly_counts |> 
-  filter(year(date) < 2017 & agegroup %in% c("65-69", "70-74", "75-79", "80-84", "85-Inf")) |> 
+  filter(between(year(date),2002,2016) & agegroup %in% c("65-69", "70-74", "75-79", "80-84", "85-Inf")) |> 
   mutate(
-    rate = (outcome / population) * 1000
+    rate = (outcome / population)
   )
 
 model <- lm(rate ~ population + factor(week) + factor(agegroup) + sex, 
@@ -242,30 +236,31 @@ summary(model)
 
 ```{r}
 weekly_counts = weekly_counts|>
-  filter(year(date) < 2018 & agegroup %in% c("65-69", "70-74", "75-79", "80-84", "85-Inf"))
-
-
+  filter(between(year(date),2002,2017) & agegroup %in% c("65-69", "70-74", "75-79", "80-84", "85-Inf"))
 
 predictions <- predict(model, newdata = weekly_counts, se.fit = TRUE)
 
 weekly_counts <- weekly_counts|>
   mutate(
     predicted_rate = predictions$fit,
-    expected_outcome = (predicted_rate * population) / 1000,
+    expected_outcome = (predicted_rate * population),
     excess_deaths = outcome - expected_outcome,
-    se_expected_outcome = (predictions$se.fit * population) / 1000,
+    se_expected_outcome = (predictions$se.fit * population),
     se_excess_deaths = se_expected_outcome
   )
 
 weekly_excess <- weekly_counts %>%
-  group_by(week) %>%
+  group_by(date) %>%
   summarise(total_excess_deaths = sum(excess_deaths, na.rm = TRUE),
             se_total_excess = sqrt(sum(se_excess_deaths^2, na.rm = TRUE)),  
             lower_ci = total_excess_deaths - 1.96 * se_total_excess,
-            upper_ci = total_excess_deaths + 1.96 * se_total_excess)
+            upper_ci = total_excess_deaths + 1.96 * se_total_excess)|>
+  filter(year(date) >= 2017)
 
-ggplot(weekly_excess, aes(x = week, y = total_excess_deaths)) +
-  geom_line()
+
+
+ggplot(weekly_excess, aes(x = date, y = total_excess_deaths)) +
+  geom_line() + geom_point() + geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci, width = 0.2))
 
 ```
   
@@ -275,7 +270,7 @@ ggplot(weekly_excess, aes(x = week, y = total_excess_deaths)) +
 weekly_counts = weekly_counts|>
   group_by(agegroup, sex)|>
   mutate(
-    rate = (outcome / population) * 1000
+    rate = (outcome / population)
   )|>
   select(rate, predicted_rate, agegroup, sex, date, week)
 
@@ -288,7 +283,7 @@ plot_data <- weekly_counts|>
 
 
 
-ggplot(plot_data, aes(x = week, y = Rate, color = Rate_Type)) +
+ggplot(plot_data, aes(x = date, y = Rate, color = Rate_Type)) +
   geom_line(alpha = 0.5, size = 0.5) +
   facet_grid(sex ~ agegroup, scales = "free_y")
 ```
