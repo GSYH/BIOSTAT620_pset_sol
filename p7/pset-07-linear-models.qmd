@@ -2,7 +2,6 @@
 title: Problem set 7 
 date: 2025-03-16
 execute:
-  eval: false
   options: 
     scipen: 999
 ---
@@ -143,7 +142,7 @@ wday(landfall, label = TRUE)
 weekly_counts = counts|>
   mutate(date = floor_date(date, week_start = 3, unit = "week"))
 
-weekly_counts
+head(weekly_counts)
 ```
 
 11. Now collapse the `weekly_count` data frame to store only one mortality value for each week, for each `sex` and `agegroup`. To this by by redefining `outcome` to have the total deaths that week for each `sex` and `agegroup`. Remove weeks that have less the 7 days of data. Finally, add a column with the MMWR week. Name the resulting data frame `weekly_counts`. 
@@ -161,7 +160,7 @@ weekly_counts <- weekly_counts %>%
   filter(total_days == 7) %>%
   mutate(week = epiweek(date))
 
-weekly_counts
+head(weekly_counts)
 ```
 
 
@@ -256,10 +255,7 @@ weekly_excess <- weekly_counts %>%
             lower_ci = total_excess_deaths - 1.96 * se_total_excess,
             upper_ci = total_excess_deaths + 1.96 * se_total_excess)|>
   filter(year(date) >= 2017)
-
-
-
-ggplot(weekly_excess, aes(x = date, y = total_excess_deaths)) +
+  ggplot(weekly_excess, aes(x = date, y = total_excess_deaths)) +
   geom_line() + geom_point() + geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci, width = 0.2))
 
 ```
@@ -280,10 +276,7 @@ plot_data <- weekly_counts|>
   tidyr::pivot_longer(cols = c(rate, predicted_rate), 
                names_to = "Rate_Type", 
                values_to = "Rate")
-
-
-
-ggplot(plot_data, aes(x = date, y = Rate, color = Rate_Type)) +
+  ggplot(plot_data, aes(x = date, y = Rate, color = Rate_Type)) +
   geom_line(alpha = 0.5, size = 0.5) +
   facet_grid(sex ~ agegroup, scales = "free_y")
 ```
