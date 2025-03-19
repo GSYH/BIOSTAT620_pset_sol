@@ -84,9 +84,15 @@ mnist <- read_mnist()
 i <- mnist$train$images
 l <- mnist$train$labels
 
-lower_bound <- 50
-upper_bound <- 205
+grey_proportions <- sum(i >= 50 & i <= 205)
 
+total <- length(i)
+grey_proportions/total
+```
+
+9. Compute and print the average grey proportion by digit class. Hint: Use logical operators and `sapply`.
+
+```{r}
 grey_proportions <- rowMeans(i >= lower_bound & i <= upper_bound)
 
 grey_digit <- tapply(grey_proportions, l, mean)
@@ -94,19 +100,10 @@ grey_digit <- tapply(grey_proportions, l, mean)
 print(grey_digit)
 ```
 
-9. Compute and print the average grey proportion by digit class. Hint: Use logical operators and `sapply`.
-
-```{r}
-grey_by_digit <- sapply(unique(l), function(digit) mean(grey_proportions[l == digit]))
-
-# Print the result
-print(grey_by_digit)
-```
-
 10. Make a box plot of grey proportion by digit class. Each point on the boxplot should represent one training image. Hint: Use logical operators and `rowMeans`.
 
 ```{r}
-grey_proportions <- rowMeans(i >= lower_bound & i <= upper_bound)
+grey_proportions <- rowMeans(i >= 50 & i <= 205)
 boxplot(grey_proportions ~ l)
 ```
 
