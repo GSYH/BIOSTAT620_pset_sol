@@ -93,7 +93,7 @@ grey_proportions/total
 9. Compute and print the average grey proportion by digit class. Hint: Use logical operators and `sapply`.
 
 ```{r}
-grey_proportions <- rowMeans(i >= lower_bound & i <= upper_bound)
+grey_proportions <- rowMeans(i >= 50 & i <= 205)
 
 grey_digit <- tapply(grey_proportions, l, mean)
 
