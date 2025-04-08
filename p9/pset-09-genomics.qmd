@@ -1,0 +1,353 @@
+---
+title: Problem set 9
+date: 2025-04-13
+---
+
+This problem set explores the analysis of high dimensional data in the application area of spatial transcriptomics. For reference, consult the following papers:
+
+* [Robust decomposition of cell type mixtures in spatial transcriptomics](https://www.nature.com/articles/s41587-021-00830-w)
+* [Cell type-specific inference of differential expression in spatial transcriptomics](https://www.nature.com/articles/s41592-022-01575-3)
+
+### Load in the data
+
+We begin by downloading the data. Hint: run this once and leave it as `eval = FALSE` in your script.
+
+```{r, eval = FALSE}
+# download data
+dir.create('data')
+file_list <- c('gene_counts', 'cell_coords', 'neuron_cells', 'other_cells',
+               'positive_genes', 'negative_genes', 'other_genes')
+for(filename in file_list) {
+  download.file(paste0('https://github.com/dmcable/BIOSTAT620/raw/main/data/p9/',filename,'.rds'), 
+                destfile = paste0('data/',filename,'.rds'))
+}
+```
+Next, we load in the data and packages (note that `counts` is a sparse matrix):
+
+```{r}
+# required packages
+library(ggplot2)
+library(Matrix)
+library(tidyverse)
+
+# load data
+counts <- readRDS('data/gene_counts.rds') # gene counts matrix
+coords <- readRDS('data/cell_coords.rds') # cell coords matrix
+
+neuron_cells <- readRDS('data/neuron_cells.rds') # list of neuron cell barcodes.
+other_cells <- readRDS('data/other_cells.rds') # list of non-neuron cell barcodes.
+
+positive_genes <- readRDS('data/positive_genes.rds') # list of genes specific for neurons
+negative_genes <- readRDS('data/negative_genes.rds') # list of genes specific for not neurons
+other_genes <- readRDS('data/other_genes.rds') # selected list of other genes
+
+all_genes <- c(positive_genes, negative_genes, other_genes) # all genes
+small_counts <- as.matrix(counts[all_genes, c(neuron_cells, other_cells)]) # subset of the counts
+```
+
+### Data visualization
+
+1. Begin by visualizing the coordinates of the cells in 2D space. Hint: this information is contained in the `coords` dataframe.
+
+```{r}
+set.seed(2025)
+plot(coords,
+     pch = 16, 
+     col = "blue")
+```
+
+2. Let's now visualize the expression of the Hpca gene, which is specific for neurons. Begin by creating a histogram of the counts of the gene. Hint: examine the `counts` matrix.
+
+```{r}
+"Hpca" %in% positive_genes
+
+grep("hpca", positive_genes, ignore.case = TRUE, value = TRUE)
+
+hpca_expr <- small_counts["Hpca", ]
+
+hpca_expr <- as.vector(hpca_expr)
+
+hist(hpca_expr,
+     breaks = 50,
+     main = "Expression of Hpca Gene (Neuronal Marker)",
+     xlab = "Hpca Expression Count",
+     col = "steelblue",
+     border = "white")
+
+hist(log1p(hpca_expr),
+     breaks = 50,
+     main = "Log Expression of Hpca Gene (Neuronal Marker)",
+     xlab = "log(1 + Hpca Expression)",
+     col = "darkorange",
+     border = "white")
+```
+
+3. Make a spatial plot of the gene expression of this gene. Use the cell coordinates as the spatial coordinates, and use gene expression counts as the color. 4
+
+```{r}
+
+max_expr <- 20
+
+selected_cells <- c(neuron_cells, other_cells)
+
+coords_sub <- coords[selected_cells, ]
+
+coords_df <- as.data.frame(coords_sub)
+colnames(coords_df) <- c("x", "y")
+
+hpca_expr <- as.vector(small_counts["Hpca", ])
+
+max_expr <- quantile(hpca_expr, 0.99)
+hpca_expr_capped <- pmin(hpca_expr, max_expr)
+
+coords_df$hpca_expr <- hpca_expr_capped
+
+
+ggplot(coords_df, aes(x = x, y = y, color = hpca_expr_capped)) +
+  geom_point(size = 0.7) +
+  scale_color_viridis_c(option = "plasma", name = "Hpca Expr", limits = c(0, max_expr)) +
+  labs(title = "Spatial Plot of Hpca Gene Expression",
+       x = "X Coordinate", y = "Y Coordinate") +
+  theme_minimal()
+```
+### Distance
+
+4. Now, make a spatial plot of the cell types. Create a dataframe `plot_df` containing only the neurons and the non-neurons. Plot the neurons and non-neurons as two different colors. Hint: the neuron barcodes are in `neuron_cells`, and the non-neuron barcodes are in `other_cells`. 
+
+```{r}
+selected_cells <- c(neuron_cells, other_cells)
+
+coords_sub <- coords[selected_cells, ]
+
+plot_df <- as.data.frame(coords_sub)
+colnames(plot_df) <- c("x", "y")
+
+plot_df$barcode <- rownames(plot_df)
+
+plot_df$cell_type <- ifelse(plot_df$barcode %in% neuron_cells, "Neuron", "Non-neuron")
+
+ggplot(plot_df, aes(x = x, y = y, color = cell_type)) +
+  geom_point(size = 0.7, alpha = 0.8) +
+  scale_color_manual(values = c("Neuron" = "blue", "Non-neuron" = "yellow")) +
+  labs(title = "Spatial Plot of Cell Types",
+       x = "X Coordinate", y = "Y Coordinate",
+       color = "Cell Type") +
+  theme_minimal()
+```
+
+5. Using only the cells selected above in `plot_df`, compute the distance matrix pairwise between each cell (hint: use `rdist` from `fields`). and compute the k-nearest-neighbors with `K = 25` (hint use `get.knn` from `FNN`). Choose the first cell, and visualize the spatial locations of the k nearest neighbors relative to that cell.
+
+```{r}
+library(fields)
+library(FNN)   
+coords_mat <- as.matrix(plot_df[, c("x", "y")]) 
+dist_mat <- rdist(coords_mat)
+
+knn_result <- get.knn(coords_mat, k = 25)
+
+first_index <- 1
+
+neighbor_indices <- knn_result$nn.index[first_index, ]
+
+first_cell <- plot_df[first_index, ]
+neighbors <- plot_df[neighbor_indices, ]
+
+ggplot() +
+  geom_point(data = plot_df, aes(x = x, y = y), color = "grey", size = 0.5) + 
+  geom_point(data = neighbors, aes(x = x, y = y), color = "yellow", size = 1.5) + 
+  geom_point(data = first_cell, aes(x = x, y = y), color = "blue", size = 2) + 
+  labs(title = "25 Nearest Neighbors of the First Cell",
+       x = "X Coordinate", y = "Y Coordinate") +
+  theme_minimal()
+```
+
+6. For each cell, calculate the proportion of neighbors that are neurons, and visualize these proportions spatially. 
+
+```{r}
+is_neuron <- ifelse(plot_df$cell_type == "Neuron", 1, 0)
+
+neighbor_idx <- knn_result$nn.index
+
+neuron_proportions <- apply(neighbor_idx, 1, function(idx) {
+  mean(is_neuron[idx])
+})
+
+plot_df$neuron_neighbor_proportion <- neuron_proportions
+
+ggplot(plot_df, aes(x = x, y = y, color = neuron_neighbor_proportion)) +
+  geom_point(size = 0.7) +
+  scale_color_viridis_c(name = "Prop. Neuron\nin Neighbors", limits = c(0, 1)) +
+  labs(title = "Proportion of Neuronal Neighbors per Cell",
+       x = "X Coordinate", y = "Y Coordinate") +
+  theme_minimal()
+```
+
+### Smoothing
+
+7. Using `loess`, fit a 2D spatial smoothing function to the neuron proportion values. Use `degree = 1` and `span = 0.05`. Create a spatial plot with the color as the smooth fit. 
+
+```{r}
+loess_fit <- loess(neuron_neighbor_proportion ~ x + y,
+                   data = plot_df,
+                   degree = 1,
+                   span = 0.05,
+                   control = loess.control(surface = "direct"))
+
+plot_df$loess_smooth <- predict(loess_fit, newdata = plot_df)
+
+ggplot(plot_df, aes(x = x, y = y, color = loess_smooth)) +
+  geom_point(size = 0.7) +
+  scale_color_viridis_c(name = "Smoothed\nNeuron Prop", limits = c(0, 1)) +
+  labs(title = "Smoothed 2D LOESS Fit of Neuron Proportions",
+       x = "X Coordinate", y = "Y Coordinate") +
+  theme_minimal()
+```
+
+8. Visualize a 1-dimensional section of the smooth function. Filter for `y` within `50` of `3000`. Plot both the proportion and the fitted smooth values in two separate colors.
+
+```{r}
+section_df <- plot_df %>% 
+  filter(abs(y - 3000) <= 50)
+
+ggplot(section_df, aes(x = x)) +
+  geom_point(aes(y = neuron_neighbor_proportion), color = "orange", size = 1) +
+  geom_point(aes(y = loess_smooth), color = "blue", size = 1) +
+  labs(title = "1D Section at y ≈ 3000",
+       x = "X Coordinate",
+       y = "Neuron Proportion / LOESS Fit") +
+  theme_minimal()
+```
+
+### Dimension reduction
+
+9. Using a subset of the counts (`small_counts`), perform a PCA (hint: use `prcomp`). Plot the first principal component (hint: check the `rotation` variable of the `prcomp` object) vs the total cellular count.  
+
+```{r}
+cell_totals <- colSums(small_counts)
+
+pca_result <- prcomp(t(small_counts), center = TRUE, scale. = TRUE)
+
+pc1 <- pca_result$x[, 1]
+
+plot(cell_totals, pc1,pch = 16, col = "blue")
+```
+Comment on your finding:
+
+This plot shows a strong negative linear relationship between: PC1 and total cellular count
+
+10. To mitigate this issue, we will normalize `small_counts` by dividing each cell by the sum of the total counts. Hint: use the `sweep` function. Repeate the PCA with the normalized count matrix. Make a plot of percent of variance explained for each of the first 500 PCs (threshold this plot at 5% variance explained). 
+
+```{r}
+cell_totals <- colSums(small_counts)
+norm_counts <- sweep(small_counts, 2, cell_totals, FUN = "/")
+
+pca_norm <- prcomp(t(norm_counts), center = TRUE, scale. = TRUE)
+
+var_explained <- (pca_norm$sdev)^2 / sum(pca_norm$sdev^2)
+
+var_explained_500 <- var_explained[1:500]
+var_explained_500 <- pmin(var_explained_500, 0.05)
+
+plot(var_explained_500 * 100,
+     type = "h",
+     xlab = "Principal Component",
+     ylab = "Variance Explained (%)",
+     main = "Variance Explained by First 500 PCs (Capped at 5%)")
+```
+
+11. Make spatial plots visualizing the first four PCs in spatial coordinates.
+
+```{r}
+pca_scores <- pca_norm$x[, 1:4]
+
+plot_df$PC1 <- pca_scores[, 1]
+plot_df$PC2 <- pca_scores[, 2]
+plot_df$PC3 <- pca_scores[, 3]
+plot_df$PC4 <- pca_scores[, 4]
+
+ggplot(plot_df, aes(x = x, y = y, color = PC1)) +
+  geom_point(size = 0.7) +
+  scale_color_viridis_c() +
+  labs(title = "Spatial Plot of PC1") +
+  theme_minimal()
+
+ggplot(plot_df, aes(x = x, y = y, color = PC2)) +
+  geom_point(size = 0.7) +
+  scale_color_viridis_c() +
+  labs(title = "Spatial Plot of PC2") +
+  theme_minimal()
+
+ggplot(plot_df, aes(x = x, y = y, color = PC3)) +
+  geom_point(size = 0.7) +
+  scale_color_viridis_c() +
+  labs(title = "Spatial Plot of PC3") +
+  theme_minimal()
+
+ggplot(plot_df, aes(x = x, y = y, color = PC4)) +
+  geom_point(size = 0.7) +
+  scale_color_viridis_c() +
+  labs(title = "Spatial Plot of PC4") +
+  theme_minimal()
+```
+
+12. For the first 20 pcs, compute the average weight for each of the following sets of genes: `positive_genes`, `negative_genes`, and `other_genes`. Create a `geom_point` plot of these with PC index as the x-axis, average weight as the y axis, and gene list type as the color.
+
+```{r}
+rotation_mat <- pca_norm$rotation[, 1:20]
+
+pos_avg <- colMeans(rotation_mat[positive_genes, ])
+neg_avg <- colMeans(rotation_mat[negative_genes, ])
+oth_avg <- colMeans(rotation_mat[other_genes, ])
+
+df_plot <- tibble(
+  PC = rep(1:20, times = 3),
+  avg_weight = c(pos_avg, neg_avg, oth_avg),
+  gene_set = rep(c("Positive", "Negative", "Other"), each = 20)
+)
+
+ggplot(df_plot, aes(x = PC, y = avg_weight, color = gene_set)) +
+  geom_point() +
+  labs(title = "Average Gene Loadings on PCs by Gene Set",
+       x = "Principal Component",
+       y = "Average Weight") +
+  theme_minimal()
+```
+
+13. Now, remake the previous plot for the first five PCs and include standard error bars.
+
+```{r}
+rotation_mat <- pca_norm$rotation[, 1:5]
+
+pos_df <- as_tibble(rotation_mat[positive_genes, ]) %>%
+  pivot_longer(cols = everything(), names_to = "PC", values_to = "weight") %>%
+  group_by(PC) %>%
+  summarise(mean = mean(weight), se = sd(weight) / sqrt(n()), .groups = "drop") %>%
+  mutate(gene_set = "Positive")
+
+neg_df <- as_tibble(rotation_mat[negative_genes, ]) %>%
+  pivot_longer(cols = everything(), names_to = "PC", values_to = "weight") %>%
+  group_by(PC) %>%
+  summarise(mean = mean(weight), se = sd(weight) / sqrt(n()), .groups = "drop") %>%
+  mutate(gene_set = "Negative")
+
+oth_df <- as_tibble(rotation_mat[other_genes, ]) %>%
+  pivot_longer(cols = everything(), names_to = "PC", values_to = "weight") %>%
+  group_by(PC) %>%
+  summarise(mean = mean(weight), se = sd(weight) / sqrt(n()), .groups = "drop") %>%
+  mutate(gene_set = "Other")
+
+df_plot <- bind_rows(pos_df, neg_df, oth_df)
+
+ggplot(df_plot, aes(x = as.numeric(str_remove(PC, "PC")), y = mean, color = gene_set)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2) +
+  labs(title = "Average PC Weights with SE for First 5 PCs",
+       x = "Principal Component",
+       y = "Average Weight") +
+  theme_minimal()
+```
+
+
+Which of the first 5 PCs appear to have statistically significant differences across gene types?
+
+I would say PC1 appears to have statistically significant differences across gene types. Because we can see that PCs 2 to 5 do not show clear separation based on what we draw on the graph.
