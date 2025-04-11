@@ -220,7 +220,8 @@ ggplot(section_df, aes(x = x)) +
 
 ### Dimension reduction
 
-9. Using a subset of the counts (`small_counts`), perform a PCA (hint: use `prcomp`). Plot the first principal component (hint: check the `rotation` variable of the `prcomp` object) vs the total cellular count.  
+9. Using a subset of the counts (`small_counts`), perform a PCA (hint: use `prcomp`). Plot the first principal component (hint: check the `x` variable of the `prcomp` object) vs the total cellular count.
+
 
 ```{r}
 cell_totals <- colSums(small_counts)
@@ -350,4 +351,4 @@ ggplot(df_plot, aes(x = as.numeric(str_remove(PC, "PC")), y = mean, color = gene
 
 Which of the first 5 PCs appear to have statistically significant differences across gene types?
 
-I would say PC1 appears to have statistically significant differences across gene types. Because we can see that PCs 2 to 5 do not show clear separation based on what we draw on the graph.
+I would say PC1 appears to have statistically significant differences across gene types. For pc3 and pc4, we can see there is not a significant differences since both their CI are somehow close together, like negative and other. e3wBecause we can see that PCs 2 to 5 do not show clear separation based on what we draw on the graph.
