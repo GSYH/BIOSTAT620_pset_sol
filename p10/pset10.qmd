@@ -1,0 +1,105 @@
+---
+title: "Problem Set 10"
+author: "Shuoyuan Gao"
+date: "2025-04-13"
+format: html
+execute: 
+  eval: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(caret)
+library(randomForest)
+library(class)
+library(e1071)
+library(xgboost)  
+```
+
+```{r}
+fn <- tempfile()
+download.file("https://github.com/dmcable/BIOSTAT620/raw/refs/heads/main/data/pset-10-mnist.rds", fn)
+dat <- readRDS(fn)
+file.remove(fn)
+```
+
+
+```{r}
+X_train <- dat$train$images / 255
+y_train <- dat$train$labels
+X_test <- dat$test$images / 255
+
+set.seed(20020811)
+rf_model <- randomForest(x = X_train, y = as.factor(y_train), ntree = 100)
+
+
+digit_predictions <- predict(rf_model, newdata = X_test)
+digit_predictions <- as.integer(as.character(digit_predictions))
+
+# Save predictions
+saveRDS(digit_predictions, file = "digit_predictions.rds")
+
+```
+
+
+#random forest
+```{r}
+X_train_df <- as.data.frame(X_train)
+colnames(X_train_df) <- paste0("V", seq_len(ncol(X_train_df)))
+
+set.seed(20020811)
+rf_model <- randomForest(x = X_train_df, y = as.factor(y_train), ntree = 100)
+rf_cv <- train(x = X_train, y = as.factor(y_train),
+               method = "rf",
+               trControl = trainControl(method = "cv", number = 5))
+rf_cv$results
+```
+
+
+#knn
+```{r}
+# PCA to reduce dimensionality
+pca <- prcomp(X_train, center = TRUE, scale. = TRUE)
+X_train_pca <- pca$x[, 1:50]  # keep first 50 components
+
+set.seed(20020811)
+knn_cv <- train(x = X_train_pca, y = as.factor(y_train),
+                method = "knn",
+                tuneGrid = expand.grid(k = seq(3, 11, 2)),
+                trControl = trainControl(method = "cv", number = 5))
+knn_cv$results
+```
+
+
+
+#xgboost
+```{r}
+library(xgboost)
+set.seed(20020811)
+xgb_data <- xgb.DMatrix(data = as.matrix(X_train), label = y_train)
+
+# Cross-validation
+xgb_cv <- xgb.cv(data = xgb_data, nrounds = 100, nfold = 5,
+                 objective = "multi:softmax", num_class = 10,
+                 eval_metric = "merror", verbose = 0)
+# Best error
+min(xgb_cv$evaluation_log$test_merror_mean)
+```
+
+
+
+
+```{r}
+model_accuracies <- tibble(
+  Model = c("Random Forest", "kNN", "SVM", "XGBoost"),
+  Accuracy = c(
+    max(rf_cv$results$Accuracy),
+    max(knn_cv$results$Accuracy),
+    max(svm_cv$results$Accuracy),
+    1 - min(xgb_cv$evaluation_log$test_merror_mean)  # convert error to accuracy
+  )
+)
+print(model_accuracies)
+
+```
