@@ -14,7 +14,10 @@ library(caret)
 library(randomForest)
 library(class)
 library(e1071)
-library(xgboost)  
+library(xgboost)
+library(keras)
+library(tensorflow)
+library(glmnet)
 ```
 
 ```{r}
@@ -24,82 +27,105 @@ dat <- readRDS(fn)
 file.remove(fn)
 ```
 
-
+#xgboost
 ```{r}
-X_train <- dat$train$images / 255
-y_train <- dat$train$labels
-X_test <- dat$test$images / 255
+library(caret)
+library(xgboost)
 
+# Load required packages
+library(caret)
+library(randomForest)
+
+# Step 1: Sample 10,000 examples
 set.seed(20020811)
-rf_model <- randomForest(x = X_train, y = as.factor(y_train), ntree = 100)
+index <- sample(nrow(dat$train$images), 10000)
+x <- dat$train$images[index, ]
+y <- factor(dat$train$labels[index])  # convert to factor for classification
+
+# Step 2: Split into training (80%) and validation (20%)
+
+n <- nrow(x)
+val_index <- sample(n, 2000)
+train_index <- setdiff(1:n, val_index)
+
+x_train <- as.data.frame(x[train_index, ])  # convert to data frame
+y_train <- y[train_index]
+
+x_valid <- as.data.frame(x[val_index, ])
+y_valid <- y[val_index]
+
+y_train_num <- as.numeric(y_train) - 1
+y_valid_num <- as.numeric(y_valid) - 1
+
+dtrain <- xgb.DMatrix(data = as.matrix(x_train), label = y_train_num)
+dvalid <- xgb.DMatrix(data = as.matrix(x_valid), label = y_valid_num)
+
+params <- list(
+  objective = "multi:softmax",
+  num_class = 10,
+  eval_metric = "merror",
+  eta = 0.2,
+  max_depth = 6,
+  subsample = 0.8,
+  colsample_bytree = 0.8
+)
 
 
-digit_predictions <- predict(rf_model, newdata = X_test)
-digit_predictions <- as.integer(as.character(digit_predictions))
+xgb_model <- xgb.train(
+  params = params,
+  data = dtrain,
+  nrounds = 10000, 
+  watchlist = list(train = dtrain, val = dvalid),
+  early_stopping_rounds = 20,
+  verbose = 1
+)
 
-# Save predictions
+y_pred <- predict(xgb_model, dvalid)
+accuracy <- mean(y_pred == y_valid_num)
+cat("Validation Accuracy:", round(accuracy, 4), "\n")
+
+```
+
+
+#final
+```{r}
+x_full <- as.matrix(dat$train$images)
+y_full <- as.numeric(dat$train$labels)
+
+dtrain_full <- xgb.DMatrix(data = x_full, label = y_full)
+
+params <- list(
+  objective = "multi:softmax",
+  num_class = 10,
+  eval_metric = "merror",
+  eta = 0.2,
+  max_depth = 6,
+  subsample = 0.8,
+  colsample_bytree = 0.8
+)
+
+set.seed(42)
+xgb_final <- xgb.train(
+  params = params,
+  data = dtrain_full,
+  nrounds = 100,
+  verbose = 1
+)
+
+x_test <- as.matrix(dat$test$images)
+dtest <- xgb.DMatrix(data = x_test)
+
+digit_predictions <- predict(xgb_final, dtest)
+digit_predictions <- as.integer(digit_predictions)
+
 saveRDS(digit_predictions, file = "digit_predictions.rds")
 
 ```
 
 
-#random forest
-```{r}
-X_train_df <- as.data.frame(X_train)
-colnames(X_train_df) <- paste0("V", seq_len(ncol(X_train_df)))
 
-set.seed(20020811)
-rf_model <- randomForest(x = X_train_df, y = as.factor(y_train), ntree = 100)
-rf_cv <- train(x = X_train, y = as.factor(y_train),
-               method = "rf",
-               trControl = trainControl(method = "cv", number = 5))
-rf_cv$results
-```
+I chose to use XGBoost for this image classification task because it is a highly efficient and scalable implementation of gradient boosting, known for delivering strong performance on structured/tabular data. Although this is an image-based dataset, the pixel values have already been flattened into 784-dimensional vectors, making XGBoost an appropriate choice.
 
+To efficiently explore model performance, I first sampled 10,000 training examples and split them into an 80% training and 20% validation set. This allowed me to tune key parameters (e.g., max_depth, eta, subsample) and apply early stopping to prevent overfitting. After identifying a good configuration with a validation accuracy of approximately 94%, I retrained the model on the entire training set (52,500 images) using the same parameters to generate predictions on the test set.
 
-#knn
-```{r}
-# PCA to reduce dimensionality
-pca <- prcomp(X_train, center = TRUE, scale. = TRUE)
-X_train_pca <- pca$x[, 1:50]  # keep first 50 components
-
-set.seed(20020811)
-knn_cv <- train(x = X_train_pca, y = as.factor(y_train),
-                method = "knn",
-                tuneGrid = expand.grid(k = seq(3, 11, 2)),
-                trControl = trainControl(method = "cv", number = 5))
-knn_cv$results
-```
-
-
-
-#xgboost
-```{r}
-library(xgboost)
-set.seed(20020811)
-xgb_data <- xgb.DMatrix(data = as.matrix(X_train), label = y_train)
-
-# Cross-validation
-xgb_cv <- xgb.cv(data = xgb_data, nrounds = 100, nfold = 5,
-                 objective = "multi:softmax", num_class = 10,
-                 eval_metric = "merror", verbose = 0)
-# Best error
-min(xgb_cv$evaluation_log$test_merror_mean)
-```
-
-
-
-
-```{r}
-model_accuracies <- tibble(
-  Model = c("Random Forest", "kNN", "SVM", "XGBoost"),
-  Accuracy = c(
-    max(rf_cv$results$Accuracy),
-    max(knn_cv$results$Accuracy),
-    max(svm_cv$results$Accuracy),
-    1 - min(xgb_cv$evaluation_log$test_merror_mean)  # convert error to accuracy
-  )
-)
-print(model_accuracies)
-
-```
+XGBoost was selected over other models like Random Forest because of its faster training speed, support for early stopping, and better generalization performance in my validation experiments.
